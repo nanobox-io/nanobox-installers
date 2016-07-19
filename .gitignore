@@ -18,5 +18,10 @@ profile
 # output
 dist
 
+certs
+
 # release
 .sign
+
+# vagrant
+.vagrant
