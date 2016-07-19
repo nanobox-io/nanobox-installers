@@ -1,0 +1,176 @@
+FROM debian:jessie
+
+RUN apt-get update && apt-get -y install \
+		autoconf build-essential curl \
+		libxml2-dev libssl-dev \
+		p7zip-full \
+		hfsplus hfsutils hfsprogs cpio
+
+# We need the bomutils to create the Mac OS X Bill of Materials (BOM) files.
+# https://github.com/hogliux/bomutils
+RUN curl -fsSL https://github.com/hogliux/bomutils/archive/0.2.tar.gz | tar xvz && \
+	cd bomutils-* && \
+	make && make install
+
+# Needed to pack/unpack the .pkg files
+RUN curl -fsSL https://github.com/mackyle/xar/archive/xar-1.6.1.tar.gz | tar xvz && \
+	cd xar-*/xar && \
+	./autogen.sh && ./configure && \
+	make && make install
+
+ENV VBOX_VERSION 5.0.20
+ENV VBOX_REV 106931
+
+RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
+	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
+
+# Download the Nanobox pieces
+ENV INSTALLER_VERSION 1
+ENV NANOBOX_VERSION 1
+
+# fetch nanobox
+RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
+RUN chmod +x /nanobox
+
+# fetch nanobox-updater
+RUN curl -fsSL -o nanobox-updater "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-updater"
+RUN chmod +x /nanobox-updater
+
+
+# Download the Docker parts
+ENV DOCKER_VERSION 1.12.0-rc2
+
+# Why '--strip-components 3'?  The client binary is in usr/local/bin/docker in
+# the tar archive.  If we extract directly, it will create a usr/local/bin
+# subdirectory (not what we want).  So we use --strip-components to remove the
+# `usr/local/bin` part and drop the bin in the current directory.
+RUN curl -fsSL -o dockerbins.tgz "https://test.docker.com/builds/Darwin/x86_64/docker-${DOCKER_VERSION}.tgz" && \
+    tar xvf dockerbins.tgz docker/docker --strip-components 1 && \
+    rm dockerbins.tgz
+
+RUN chmod +x /docker
+
+
+ENV DOCKER_MACHINE_VERSION 0.8.0-rc1
+RUN curl -fsSL -o /docker-machine https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Darwin-x86_64
+
+RUN chmod +x /docker-machine
+
+ENV BOOT2DOCKER_ISO_VERSION $DOCKER_VERSION
+RUN curl -fsSL -o /boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v$DOCKER_VERSION/boot2docker.iso
+
+#  Extract the VirtualBox .pkg
+RUN mkdir -p /mpkg/vbox && \
+	cd /mpkg/vbox && \
+	7z x /vbox.dmg -ir'!*.hfs' && \
+	7z x `find . -name '*.hfs'` -ir'!*.pkg' && \
+	mv VirtualBox/VirtualBox.pkg . && \
+	rm -rf vbox.dmg && \
+	rm -rf `find . -name '*.hfs'`
+
+# Extract the .pkg files
+RUN cd /mpkg/vbox && \
+	mv VirtualBox.pkg /tmp && \
+	xar -xf /tmp/VirtualBox.pkg && \
+	rm -rf /tmp/VirtualBox.pkg
+
+RUN cd /mpkg/vbox && \
+	mv *.pkg .. && \
+	rm -rf vbox
+
+# Add components
+COPY mac/mpkg/Distribution /mpkg/Distribution
+
+# nanobox.pkg
+COPY mac/mpkg/nanobox.pkg /mpkg/nanobox.pkg
+RUN cd /mpkg/nanobox.pkg && \
+	mkdir rootfs && \
+	cd rootfs && \
+  mkdir -p usr/local/bin && \
+  mv /nanobox usr/local/bin/ && \
+	mv /nanobox-updater usr/local/bin/ && \
+  ls -al /usr/local/bin/ && \
+	find . | cpio -o --format odc | gzip -c > ../Payload && \
+	mkbom . ../Bom && \
+	sed -i \
+		-e "s/%NANOBOX_NUMBER_OF_FILES%/`find . | wc -l`/g" \
+		-e "s/%NANOBOX_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
+		-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
+		../PackageInfo /mpkg/Distribution && \
+	cd .. && \
+	rm -rf ./rootfs
+
+# docker.pkg
+COPY mac/mpkg/docker.pkg /mpkg/docker.pkg
+RUN cd /mpkg/docker.pkg && \
+	mkdir rootfs && \
+	cd rootfs && \
+  mkdir -p usr/local/bin && \
+  mv /docker usr/local/bin/ && \
+  ls -al /usr/local/bin/ && \
+	find . | cpio -o --format odc | gzip -c > ../Payload && \
+	mkbom . ../Bom && \
+	sed -i \
+		-e "s/%DOCKER_NUMBER_OF_FILES%/`find . | wc -l`/g" \
+		-e "s/%DOCKER_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
+		-e "s/%DOCKER_VERSION%/$DOCKER_VERSION/g" \
+		../PackageInfo /mpkg/Distribution && \
+	cd .. && \
+	rm -rf ./rootfs
+
+# dockermachine.pkg
+COPY mac/mpkg/dockermachine.pkg /mpkg/dockermachine.pkg
+RUN cd /mpkg/dockermachine.pkg && \
+	mkdir rootfs && \
+	cd rootfs && \
+  mkdir -p usr/local/bin && \
+  mv /docker-machine usr/local/bin/ && \
+  ls -al /usr/local/bin/ && \
+	find . | cpio -o --format odc | gzip -c > ../Payload && \
+	mkbom . ../Bom && \
+	sed -i \
+		-e "s/%DOCKERMACHINE_NUMBER_OF_FILES%/`find . | wc -l`/g" \
+		-e "s/%DOCKERMACHINE_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
+		-e "s/%DOCKERMACHINE_VERSION%/$DOCKER_MACHINE_VERSION/g" \
+		../PackageInfo /mpkg/Distribution && \
+	cd .. && \
+	rm -rf ./rootfs
+
+# boot2dockeriso.pkg
+COPY mac/mpkg/boot2dockeriso.pkg /mpkg/boot2dockeriso.pkg
+RUN cd /mpkg/boot2dockeriso.pkg && \
+  cd Scripts && find . | cpio -o --format odc | gzip -c > ../Scripts.bin && cd .. && \
+  rm -r Scripts && mv Scripts.bin Scripts && \
+	mkdir ./rootfs && \
+	cd ./rootfs && \
+	cp /boot2docker.iso . && \
+	find . | cpio -o --format odc | gzip -c > ../Payload && \
+	mkbom . ../Bom && \
+	sed -i \
+		-e "s/%BOOT2DOCKER_ISO_NUMBER_OF_FILES%/`find . | wc -l`/g" \
+		-e "s/%BOOT2DOCKER_ISO_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
+		-e "s/%BOOT2DOCKER_ISO_VERSION%/$BOOT2DOCKER_ISO_VERSION/g" \
+		../PackageInfo /mpkg/Distribution && \
+	cd .. && \
+	rm -rf ./rootfs
+
+COPY mac/mpkg/Resources /mpkg/Resources
+
+RUN sed -i \
+		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
+		mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf
+RUN sed -i \
+			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			/mpkg/Distribution && \
+		sed -i \
+			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
+			-e "s/%DOCKER_VERSION%/$DOCKER_VERSION/g" \
+			-e "s/%DOCKERMACHINE_VERSION%/$DOCKER_MACHINE_VERSION/g" \
+			-e "s/%BOOT2DOCKER_ISO_VERSION%/$BOOT2DOCKER_ISO_VERSION/g" \
+			mpkg/Resources/en.lproj/Localizable.strings
+
+# Repackage back. Yes, --compression=none is mandatory.
+# or this won't install in OSX.
+RUN cd /mpkg && \
+	xar -c --compression=none -f /Nanobox.pkg .

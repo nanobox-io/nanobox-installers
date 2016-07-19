@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker build -t mac-installer -f Dockerfile.mac .
+CONTAINER="$(docker run -d mac-installer)"
+mkdir -p dist
+docker cp "${CONTAINER}":/Nanobox.pkg dist/
+docker rm "${CONTAINER}" 2>/dev/null || true
