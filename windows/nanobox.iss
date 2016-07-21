@@ -5,6 +5,7 @@
 #define MyAppContact "https://nanobox.io"
 
 #define nanobox "..\bundle\nanobox.exe"
+#define nanoboxUpdater "..\bundle\nanobox-updater.exe"
 #define b2dIsoPath "..\bundle\boot2docker.iso"
 #define dockerCli "..\bundle\docker.exe"
 #define dockerMachineCli "..\bundle\docker-machine.exe"
@@ -58,6 +59,7 @@ Name: "VirtualBox"; Description: "VirtualBox"; Types: full custom; Flags: disabl
 
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
+Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#dockerCli}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Docker"
 Source: "{#dockerMachineCli}"; DestDir: "{app}"; Flags: ignoreversion; Components: "DockerMachine"
 Source: "{#b2dIsoPath}"; DestDir: "{app}"; Flags: ignoreversion; Components: "DockerMachine"; AfterInstall: CopyBoot2DockerISO()
