@@ -32,9 +32,9 @@ ENV NANOBOX_VERSION 1
 RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
 RUN chmod +x /nanobox
 
-# fetch nanobox-updater
-RUN curl -fsSL -o nanobox-updater "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-updater"
-RUN chmod +x /nanobox-updater
+# fetch nanobox-update
+RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
+RUN chmod +x /nanobox-update
 
 
 # Download the Docker parts
@@ -88,7 +88,7 @@ RUN cd /mpkg/nanobox.pkg && \
 	cd rootfs && \
   mkdir -p usr/local/bin && \
   mv /nanobox usr/local/bin/ && \
-	mv /nanobox-updater usr/local/bin/ && \
+	mv /nanobox-update usr/local/bin/ && \
   ls -al /usr/local/bin/ && \
 	find . | cpio -o --format odc | gzip -c > ../Payload && \
 	mkbom . ../Bom && \
@@ -175,13 +175,13 @@ RUN sed -i \
 RUN cd /mpkg && \
 	xar -c --compression=none -f /Nanobox.pkg .
 
-COPY certs /certs
+COPY certs/mac /certs
 RUN cd /mpkg && \
 	xar --sign -f /Nanobox.pkg --digestinfo-to-sign digestinfo.dat \
 	--sig-size 256 \
-	--cert-loc /certs/mac/cert00 \
-	--cert-loc /certs/mac/cert01 \
-	--cert-loc /certs/mac/cert02 && \
-	openssl rsautl -sign -inkey /certs/mac/key.pem -in digestinfo.dat \
+	--cert-loc /certs/cert00 \
+	--cert-loc /certs/cert01 \
+	--cert-loc /certs/cert02 && \
+	openssl rsautl -sign -inkey /certs/key.pem -in digestinfo.dat \
 	-out signature.dat && \
 	xar --inject-sig signature.dat -f /Nanobox.pkg
