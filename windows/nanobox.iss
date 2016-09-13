@@ -136,7 +136,7 @@ begin
 
   WizardForm.WelcomeLabel2.AutoSize := True;
 
-  Wizardform.ComponentsList.ItemEnabled[3] := not NeedToInstallVirtualBox();
+  Wizardform.ComponentsList.ItemEnabled[1] := not NeedToInstallVirtualBox();
 end;
 
 procedure RunInstallVirtualBox();
