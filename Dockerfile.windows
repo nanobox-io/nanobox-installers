@@ -1,33 +1,9 @@
-FROM debian:jessie
-
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN dpkg --add-architecture i386
-RUN sed -i "s/main/main contrib non-free/" etc/apt/sources.list
-RUN apt-get update && apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev
-
-# innosetup
-RUN mkdir innosetup && \
-    cd innosetup && \
-    curl -fsSL -o innounp045.rar "https://downloads.sourceforge.net/project/innounp/innounp/innounp%200.45/innounp045.rar?r=&ts=1439566551&use_mirror=skylineservers" && \
-    unrar e innounp045.rar
-
-RUN cd innosetup && \
-    curl -fsSL -o is-unicode.exe http://files.jrsoftware.org/is/5/isetup-5.5.8-unicode.exe && \
-    wine "./innounp.exe" -e "is-unicode.exe"
-
-RUN mkdir /osslsigncode && \
-    cd /osslsigncode && \
-    curl -fsSL -o osslsigncode-1.7.1.tar.gz "http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz?r=&ts=1469050502&use_mirror=skylineservers" && \
-    tar -xzf osslsigncode-1.7.1.tar.gz && \
-    cd osslsigncode-1.7.1 && \
-    ./configure && \
-    make
+FROM nanobox/windows-env
 
 # installer components
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
-ENV BOOT2DOCKER_ISO_VERSION $DOCKER_VERSION
+ENV BOOT2DOCKER_ISO_VERSION 1.12.1
 ENV VIRTUALBOX_VERSION 5.0.20
 ENV VIRTUALBOX_REVISION 106931
 
@@ -67,4 +43,5 @@ RUN rm -rf /tmp/.wine-0/
 # RUN wine ../innosetup/ISCC.exe NanoboxSetup.iss /DMyAppVersion=$INSTALLER_VERSION /DMixpanelToken=$MIXPANEL_TOKEN
 RUN wine ../innosetup/ISCC.exe nanobox.iss /DMyAppVersion=$INSTALLER_VERSION
 
-RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox installer" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /installer/Output/NanoboxSetup.exe -out /installer/Output/NanoboxSetup-signed.exe
+RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox installer" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /installer/Output/NanoboxSetup.exe -out /installer/Output/NanoboxSetup-signed.exe && \
+    cp /installer/Output/NanoboxSetup-signed.exe /installer/Output/NanoboxSetup.exe

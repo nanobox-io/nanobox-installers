@@ -5,7 +5,7 @@
 #define MyAppContact "https://nanobox.io"
 
 #define nanobox "..\bundle\nanobox.exe"
-#define nanoboxUpdater "..\bundle\nanobox-updater.exe"
+#define nanoboxUpdater "..\bundle\nanobox-update.exe"
 #define b2dIsoPath "..\bundle\boot2docker.iso"
 #define virtualBoxCommon "..\bundle\common.cab"
 #define virtualBoxMsi "..\bundle\VirtualBox_amd64.msi"
@@ -56,7 +56,7 @@ Name: "VirtualBox"; Description: "VirtualBox"; Types: full custom; Flags: disabl
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
-Source: "{#b2dIsoPath}"; DestDir: "{app}"; Flags: ignoreversion; Components: "DockerMachine"; AfterInstall: CopyBoot2DockerISO()
+Source: "{#b2dIsoPath}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"; AfterInstall: CopyBoot2DockerISO()
 Source: "{#virtualBoxCommon}"; DestDir: "{app}\installers\virtualbox"; Components: "VirtualBox"
 Source: "{#virtualBoxMsi}"; DestDir: "{app}\installers\virtualbox"; DestName: "virtualbox.msi"; AfterInstall: RunInstallVirtualBox(); Components: "VirtualBox"
 

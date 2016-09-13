@@ -3,9 +3,6 @@
 'choiceNanobox_title' = 'Nanobox v%NANOBOX_VERSION%';
 'choiceNanobox_msg' = 'Installs Nanobox for Mac OS X into /usr/local/bin/';
 
-'choiceDockerCLI_title' = 'Docker Client %DOCKER_VERSION%';
-'choiceDockerCLI_msg' = 'Installs the Docker Client for Mac OS X into /usr/local/bin/';
-
 'choiceDockerMachineCLI_title' = 'Docker Machine %DOCKERMACHINE_VERSION%';
 'choiceDockerMachineCLI_msg' = 'Installs the Docker Machine binaries into /usr/local/bin/';
 

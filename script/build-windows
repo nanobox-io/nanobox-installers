@@ -2,9 +2,9 @@
 
 set -e
 
-docker build -t windows-installer -f Dockerfile.windows .
+docker build --no-cache -t windows-installer -f Dockerfile.windows .
 CONTAINER="$(docker run -d windows-installer)"
-mkdir -p dist
-docker cp "${CONTAINER}":/installer/Output/NanoboxSetup.exe dist/
-docker cp "${CONTAINER}":/installer/Output/NanoboxSetup-signed.exe dist/
-# docker rm "${CONTAINER}" 2>/dev/null || true
+mkdir -p dist/windows
+docker cp "${CONTAINER}":/installer/Output/NanoboxSetup.exe dist/windows/
+# docker cp "${CONTAINER}":/installer/Output/NanoboxSetup-signed.exe dist/
+docker rm "${CONTAINER}" 2>/dev/null || true

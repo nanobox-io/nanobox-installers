@@ -1,0 +1,24 @@
+FROM debian:jessie
+
+RUN apt-get update && apt-get -y install \
+		autoconf build-essential curl \
+		libxml2-dev libssl-dev \
+		p7zip-full \
+		hfsplus hfsutils hfsprogs cpio || \
+	apt-get update && apt-get -y install \
+		autoconf build-essential curl \
+		libxml2-dev libssl-dev \
+		p7zip-full \
+		hfsplus hfsutils hfsprogs cpio
+
+# We need the bomutils to create the Mac OS X Bill of Materials (BOM) files.
+# https://github.com/hogliux/bomutils
+RUN curl -fsSL https://github.com/hogliux/bomutils/archive/0.2.tar.gz | tar xvz && \
+	cd bomutils-* && \
+	make && make install
+
+# Needed to pack/unpack the .pkg files
+RUN curl -fsSL https://github.com/mackyle/xar/archive/xar-1.6.1.tar.gz | tar xvz && \
+	cd xar-*/xar && \
+	./autogen.sh && ./configure && \
+	make && make install
