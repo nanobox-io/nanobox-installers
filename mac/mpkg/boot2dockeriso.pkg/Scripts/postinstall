@@ -2,13 +2,11 @@
 
 CONSOLE_USER=$(stat -f '%Su' /dev/console)
 CONSOLE_USER_HOME=$(su $CONSOLE_USER -c 'echo $HOME')
-VM=default
+VM=nanobox
 
 # Fix permissions on binaries
 chown -R $CONSOLE_USER:admin /usr/local/bin/nanobox || true
 chown -R $CONSOLE_USER:admin /usr/local/bin/nanobox-updater || true
-chown -R $CONSOLE_USER:admin /usr/local/bin/docker || true
-chown -R $CONSOLE_USER:admin /usr/local/bin/docker-machine || true
 
 # Place boot2docker ISO in cache & upgrade the boot2docker VM
 mkdir -p $CONSOLE_USER_HOME/.docker/machine/cache

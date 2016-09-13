@@ -27,14 +27,9 @@ RUN mkdir /osslsigncode && \
 # installer components
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
-ENV DOCKER_VERSION 1.12.0-rc2
-ENV DOCKER_MACHINE_VERSION 0.8.0-rc1
 ENV BOOT2DOCKER_ISO_VERSION $DOCKER_VERSION
 ENV VIRTUALBOX_VERSION 5.0.20
 ENV VIRTUALBOX_REVISION 106931
-
-# todo: integrate with mixpanel
-# ENV MIXPANEL_TOKEN c306ae65c33d7d09fe3e546f36493a6e
 
 RUN mkdir /bundle
 
@@ -45,15 +40,6 @@ RUN curl -fsSL -o nanobox.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox
 
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/windows/amd64/nanobox-update.exe"
-
-# fetch docker (temporary)
-RUN curl -fsSL -o dockerbins.zip "https://test.docker.com/builds/Windows/x86_64/docker-${DOCKER_VERSION}.zip" && \
-    unzip dockerbins.zip && \
-    mv docker/docker.exe . && \
-    rm -r docker/ dockerbins.zip
-
-# fetch docker-machine (temporary)
-RUN curl -fsSL -o docker-machine.exe "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Windows-x86_64.exe"
 
 RUN curl -fsSL -o boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v$BOOT2DOCKER_ISO_VERSION/boot2docker.iso
 

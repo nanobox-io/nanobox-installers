@@ -36,26 +36,6 @@ RUN chmod +x /nanobox
 RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
 RUN chmod +x /nanobox-update
 
-
-# Download the Docker parts
-ENV DOCKER_VERSION 1.12.0-rc2
-
-# Why '--strip-components 3'?  The client binary is in usr/local/bin/docker in
-# the tar archive.  If we extract directly, it will create a usr/local/bin
-# subdirectory (not what we want).  So we use --strip-components to remove the
-# `usr/local/bin` part and drop the bin in the current directory.
-RUN curl -fsSL -o dockerbins.tgz "https://test.docker.com/builds/Darwin/x86_64/docker-${DOCKER_VERSION}.tgz" && \
-    tar xvf dockerbins.tgz docker/docker --strip-components 1 && \
-    rm dockerbins.tgz
-
-RUN chmod +x /docker
-
-
-ENV DOCKER_MACHINE_VERSION 0.8.0-rc1
-RUN curl -fsSL -o /docker-machine https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Darwin-x86_64
-
-RUN chmod +x /docker-machine
-
 ENV BOOT2DOCKER_ISO_VERSION $DOCKER_VERSION
 RUN curl -fsSL -o /boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v$DOCKER_VERSION/boot2docker.iso
 
@@ -100,42 +80,6 @@ RUN cd /mpkg/nanobox.pkg && \
 	cd .. && \
 	rm -rf ./rootfs
 
-# docker.pkg
-COPY mac/mpkg/docker.pkg /mpkg/docker.pkg
-RUN cd /mpkg/docker.pkg && \
-	mkdir rootfs && \
-	cd rootfs && \
-  mkdir -p usr/local/bin && \
-  mv /docker usr/local/bin/ && \
-  ls -al /usr/local/bin/ && \
-	find . | cpio -o --format odc | gzip -c > ../Payload && \
-	mkbom . ../Bom && \
-	sed -i \
-		-e "s/%DOCKER_NUMBER_OF_FILES%/`find . | wc -l`/g" \
-		-e "s/%DOCKER_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
-		-e "s/%DOCKER_VERSION%/$DOCKER_VERSION/g" \
-		../PackageInfo /mpkg/Distribution && \
-	cd .. && \
-	rm -rf ./rootfs
-
-# dockermachine.pkg
-COPY mac/mpkg/dockermachine.pkg /mpkg/dockermachine.pkg
-RUN cd /mpkg/dockermachine.pkg && \
-	mkdir rootfs && \
-	cd rootfs && \
-  mkdir -p usr/local/bin && \
-  mv /docker-machine usr/local/bin/ && \
-  ls -al /usr/local/bin/ && \
-	find . | cpio -o --format odc | gzip -c > ../Payload && \
-	mkbom . ../Bom && \
-	sed -i \
-		-e "s/%DOCKERMACHINE_NUMBER_OF_FILES%/`find . | wc -l`/g" \
-		-e "s/%DOCKERMACHINE_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
-		-e "s/%DOCKERMACHINE_VERSION%/$DOCKER_MACHINE_VERSION/g" \
-		../PackageInfo /mpkg/Distribution && \
-	cd .. && \
-	rm -rf ./rootfs
-
 # boot2dockeriso.pkg
 COPY mac/mpkg/boot2dockeriso.pkg /mpkg/boot2dockeriso.pkg
 RUN cd /mpkg/boot2dockeriso.pkg && \
@@ -165,8 +109,6 @@ RUN sed -i \
 		sed -i \
 			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
 			-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
-			-e "s/%DOCKER_VERSION%/$DOCKER_VERSION/g" \
-			-e "s/%DOCKERMACHINE_VERSION%/$DOCKER_MACHINE_VERSION/g" \
 			-e "s/%BOOT2DOCKER_ISO_VERSION%/$BOOT2DOCKER_ISO_VERSION/g" \
 			mpkg/Resources/en.lproj/Localizable.strings
 

@@ -7,8 +7,6 @@
 #define nanobox "..\bundle\nanobox.exe"
 #define nanoboxUpdater "..\bundle\nanobox-updater.exe"
 #define b2dIsoPath "..\bundle\boot2docker.iso"
-#define dockerCli "..\bundle\docker.exe"
-#define dockerMachineCli "..\bundle\docker-machine.exe"
 #define virtualBoxCommon "..\bundle\common.cab"
 #define virtualBoxMsi "..\bundle\VirtualBox_amd64.msi"
 
@@ -53,22 +51,17 @@ Name: vbox_ndis5; Description: "Install VirtualBox with NDIS5 driver[default NDI
 
 [Components]
 Name: "Nanobox"; Description: "Nanobox for Windows" ; Types: full custom; Flags: fixed
-Name: "Docker"; Description: "Docker Client for Windows" ; Types: full custom; Flags: fixed
-Name: "DockerMachine"; Description: "Docker Machine for Windows" ; Types: full custom; Flags: fixed
 Name: "VirtualBox"; Description: "VirtualBox"; Types: full custom; Flags: disablenouninstallwarning
 
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
-Source: "{#dockerCli}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Docker"
-Source: "{#dockerMachineCli}"; DestDir: "{app}"; Flags: ignoreversion; Components: "DockerMachine"
 Source: "{#b2dIsoPath}"; DestDir: "{app}"; Flags: ignoreversion; Components: "DockerMachine"; AfterInstall: CopyBoot2DockerISO()
 Source: "{#virtualBoxCommon}"; DestDir: "{app}\installers\virtualbox"; Components: "VirtualBox"
 Source: "{#virtualBoxMsi}"; DestDir: "{app}\installers\virtualbox"; DestName: "virtualbox.msi"; AfterInstall: RunInstallVirtualBox(); Components: "VirtualBox"
 
 [UninstallRun]
-Filename: "{app}\nanobox.exe"; Parameters: "implode"
-Filename: "{app}\docker-machine.exe"; Parameters: "rm -f default"
+Filename: "{app}\nanobox.exe"; Parameters: "destroy"
 
 [Registry]
 Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"NANOBOX_INSTALL_PATH"; ValueData:"{app}" ; Flags: preservestringtype uninsdeletevalue;
