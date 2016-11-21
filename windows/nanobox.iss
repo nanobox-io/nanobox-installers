@@ -6,9 +6,11 @@
 
 #define nanobox "..\bundle\nanobox.exe"
 #define nanoboxUpdater "..\bundle\nanobox-update.exe"
-#define b2dIsoPath "..\bundle\boot2docker.iso"
 #define virtualBoxCommon "..\bundle\common.cab"
 #define virtualBoxMsi "..\bundle\VirtualBox_amd64.msi"
+#define ansiconexe "..\bundle\ansicon.exe"
+#define ansicon32 "..\bundle\ANSI32.dll"
+#define ansicon64 "..\bundle\ANSI64.dll"
 
 [Setup]
 AppCopyright={#MyAppPublisher}
@@ -48,6 +50,7 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 Name: modifypath; Description: "Add nanobox binaries to &PATH"
 Name: upgradevm; Description: "Upgrade Boot2Docker VM"
 Name: vbox_ndis5; Description: "Install VirtualBox with NDIS5 driver[default NDIS6]"; Components: VirtualBox; Flags: unchecked
+Name: ansicon; Description: "Install ANSI escape sequences for console programs"
 
 [Components]
 Name: "Nanobox"; Description: "Nanobox for Windows" ; Types: full custom; Flags: fixed
@@ -56,12 +59,15 @@ Name: "VirtualBox"; Description: "VirtualBox"; Types: full custom; Flags: disabl
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
-Source: "{#b2dIsoPath}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"; AfterInstall: CopyBoot2DockerISO()
 Source: "{#virtualBoxCommon}"; DestDir: "{app}\installers\virtualbox"; Components: "VirtualBox"
 Source: "{#virtualBoxMsi}"; DestDir: "{app}\installers\virtualbox"; DestName: "virtualbox.msi"; AfterInstall: RunInstallVirtualBox(); Components: "VirtualBox"
+Source: "{#ansiconexe}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#ansicon32}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#ansicon64}"; DestDir: "{app}"; Components: "Nanobox"
 
 [UninstallRun]
-Filename: "{app}\nanobox.exe"; Parameters: "destroy"
+Filename: "{app}\nanobox.exe"; Parameters: "implode"
+Filename: "{app}\ansicon.exe"; Parameters: "-U"
 
 [Registry]
 Root: HKCU; Subkey: "Environment"; ValueType:string; ValueName:"NANOBOX_INSTALL_PATH"; ValueData:"{app}" ; Flags: preservestringtype uninsdeletevalue;
@@ -153,15 +159,6 @@ begin
 	end;
 end;
 
-procedure CopyBoot2DockerISO();
-begin
-  WizardForm.FilenameLabel.Caption := 'copying boot2docker iso'
-  if not ForceDirectories(ExpandConstant('{userdocs}\..\.docker\machine\cache')) then
-      MsgBox('Failed to create docker machine cache dir', mbError, MB_OK);
-  if not FileCopy(ExpandConstant('{app}\boot2docker.iso'), ExpandConstant('{userdocs}\..\.docker\machine\cache\boot2docker.iso'), false) then
-      MsgBox('File moving failed!', mbError, MB_OK);
-end;
-
 function CanUpgradeVM(): Boolean;
 var
   ResultCode: Integer;
@@ -191,11 +188,8 @@ var
 begin
   WizardForm.StatusLabel.Caption := 'Upgrading Docker Toolbox VM...'
   ExecAsOriginalUser(ExpandConstant('{app}\docker-machine.exe'), 'stop default', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  if (ResultCode = 0) or (ResultCode = 1) then
+  if not ((ResultCode = 0) or (ResultCode = 1)) then
   begin
-    FileCopy(ExpandConstant('{userdocs}\..\.docker\machine\cache\boot2docker.iso'), ExpandConstant('{userdocs}\..\.docker\machine\machines\default\boot2docker.iso'), false)
-  end
-  else begin
     MsgBox('VM Upgrade Failed because the VirtualBox VM could not be stopped.', mbCriticalError, MB_OK);
     Result := false
     WizardForm.Close;
@@ -213,6 +207,16 @@ begin
   setArrayLength(Result, 1);
   Result[0] := ExpandConstant('{app}');
 end;
+
+procedure RunInstallAnsicon();
+var
+  ResultCode: Integer;
+begin
+  WizardForm.FilenameLabel.Caption := 'installing Ansicon'
+  if not Exec(ExpandConstant('{app}\ansicon'), ExpandConstant('-I'), '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+    MsgBox('ansicon install failure', mbInformation, MB_OK);
+end;
+
 #include "modpath.iss"
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -222,6 +226,8 @@ begin
   Success := True;
   if CurStep = ssPostInstall then
   begin
+    if isTaskSelected('ansicon') then
+      RunInstallAnsicon();
     if IsTaskSelected(ModPathName) then
       ModPath();
     if not WizardSilent() then

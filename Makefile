@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: mac windows clean clean-mac clean-windows publish certs windows-env mac-env
+.PHONY: mac windows clean clean-mac clean-windows publish publish-beta certs windows-env mac-env
 
 default: mac windows
 	@true
@@ -40,5 +40,12 @@ publish:
 	aws s3 sync \
 		dist/ \
 		s3://tools.nanobox.io/installers/v1 \
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
+		--region us-east-1
+
+publish-beta:
+	aws s3 sync \
+		dist/ \
+		s3://tools.nanobox.io/installers/beta \
 		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1

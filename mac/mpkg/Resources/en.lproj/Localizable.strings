@@ -6,9 +6,6 @@
 'choiceDockerMachineCLI_title' = 'Docker Machine %DOCKERMACHINE_VERSION%';
 'choiceDockerMachineCLI_msg' = 'Installs the Docker Machine binaries into /usr/local/bin/';
 
-'choiceBoot2DockerISO_title' = 'Boot2Docker ISO %BOOT2DOCKER_ISO_VERSION%';
-'choiceBoot2DockerISO_msg' = 'Installs the boot2docker.iso into /usr/local/share/';
-
 'choiceVBox_title' = 'Oracle VM VirtualBox %VBOX_VERSION%';
 'choiceVBox_msg' = 'Installs or Upgrades the Oracle VM VirtualBox application into /Applications if it is not already installed.';
 

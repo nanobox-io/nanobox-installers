@@ -3,9 +3,8 @@ FROM nanobox/windows-env
 # installer components
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
-ENV BOOT2DOCKER_ISO_VERSION 1.12.1
-ENV VIRTUALBOX_VERSION 5.0.20
-ENV VIRTUALBOX_REVISION 106931
+ENV VIRTUALBOX_VERSION 5.1.8
+ENV VIRTUALBOX_REVISION 111374
 
 RUN mkdir /bundle
 
@@ -17,7 +16,11 @@ RUN curl -fsSL -o nanobox.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/windows/amd64/nanobox-update.exe"
 
-RUN curl -fsSL -o boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v$BOOT2DOCKER_ISO_VERSION/boot2docker.iso
+RUN curl -fsSL -o ansi166.zip https://github.com/adoxa/ansicon/releases/download/v1.66/ansi166.zip
+
+RUN unzip ansi166.zip
+
+RUN cp x64/* /bundle
 
 # fetch virtualbox
 RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"

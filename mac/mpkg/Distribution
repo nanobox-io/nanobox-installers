@@ -7,7 +7,6 @@
     <choices-outline>
         <line choice="choiceNanobox"/>
         <line choice="choiceVBox"/>
-        <line choice="choiceBoot2DockerISO"/>
     </choices-outline>
     <choice id="choiceNanobox" title="choiceNanobox_title" description="choiceNanobox_msg" start_enabled="false" start_selected="true" start_visible="true">
         <pkg-ref id="io.nanobox.pkg.nanobox"/>
@@ -35,13 +34,6 @@
         </bundle-version>
     </pkg-ref>
     <pkg-ref id="org.virtualbox.pkg.virtualboxcli">
-        <bundle-version/>
-    </pkg-ref>
-    <choice id="choiceBoot2DockerISO" title="choiceBoot2DockerISO_title" description="choiceBoot2DockerISO_msg" start_selected="true" start_enabled="true" start_visible="false">
-        <pkg-ref id="io.boot2dockeriso.pkg.boot2dockeriso"/>
-    </choice>
-    <pkg-ref id="io.boot2dockeriso.pkg.boot2dockeriso" auth="Root" version="%BOOT2DOCKER_ISO_VERSION%" installKBytes="%BOOT2DOCKER_ISO_INSTALL_KBYTES%">#boot2dockeriso.pkg</pkg-ref>
-    <pkg-ref id="io.boot2dockeriso.pkg.boot2dockeriso">
         <bundle-version/>
     </pkg-ref>
 
