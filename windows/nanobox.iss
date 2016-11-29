@@ -217,6 +217,15 @@ begin
     MsgBox('ansicon install failure', mbInformation, MB_OK);
 end;
 
+procedure RunUpdateNanobox();
+var
+  ResultCode: Integer;
+begin
+  WizardForm.FilenameLabel.Caption := 'Updating nanobox'
+  if not Exec(ExpandConstant('{app}\nanobox-update.exe'), '', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+    MsgBox('nanobox update failure', mbInformation, MB_OK);
+end;
+
 #include "modpath.iss"
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -226,6 +235,7 @@ begin
   Success := True;
   if CurStep = ssPostInstall then
   begin
+    RunUpdateNanobox();
     if isTaskSelected('ansicon') then
       RunInstallAnsicon();
     if IsTaskSelected(ModPathName) then

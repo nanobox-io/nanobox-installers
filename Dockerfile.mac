@@ -1,7 +1,7 @@
 FROM nanobox/mac-env
 
-ENV VBOX_VERSION 5.1.8
-ENV VBOX_REV 111374
+ENV VBOX_VERSION 5.1.10
+ENV VBOX_REV 112026
 
 RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
 	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
@@ -45,10 +45,10 @@ COPY mac/mpkg/nanobox.pkg /mpkg/nanobox.pkg
 RUN cd /mpkg/nanobox.pkg && \
 	mkdir rootfs && \
 	cd rootfs && \
-  mkdir -p usr/local/bin && \
-  mv /nanobox usr/local/bin/ && \
+    mkdir -p usr/local/bin && \
+	mv /nanobox usr/local/bin/ && \
 	mv /nanobox-update usr/local/bin/ && \
-  ls -al /usr/local/bin/ && \
+    ls -al /usr/local/bin/ && \
 	find . | cpio -o --format odc | gzip -c > ../Payload && \
 	mkbom . ../Bom && \
 	sed -i \

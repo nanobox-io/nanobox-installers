@@ -18,14 +18,18 @@ windows-env:
 		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
 	fi
 
-mac: clean-mac mac-env
+mac: clean-mac mac-env mac/mpkg/nanobox.pkg/Scripts
 	./script/build-mac
+
+mac/mpkg/nanobox.pkg/Scripts:
+	cd mac; echo "scripts/postinstall" | cpio -o --format odc | gzip -c > mpkg/nanobox.pkg/Scripts
 
 windows: clean-windows windows-env
 	./script/build-windows
 
 clean-mac:
 	rm -f dist/mac/Nanobox*.pkg
+	rm -f mac/mpkg/nanobox.pkg/Scripts
 
 clean-windows:
 	rm -f dist/windows/Nanobox*.exe
