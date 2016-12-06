@@ -20,7 +20,7 @@ windows-env:
 		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
 	fi
 
-mac: clean-mac mac-env mac/mpkg/nanobox.pkg/Scripts virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg
+mac: clean-mac mac-env mac/mpkg/nanobox.pkg/Scripts virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
 	./script/build-mac
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
@@ -31,7 +31,7 @@ virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
 mac/mpkg/nanobox.pkg/Scripts:
 	cd mac; echo "scripts/postinstall" | cpio -o --format odc | gzip -c > mpkg/nanobox.pkg/Scripts
 
-windows: clean-windows windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe
+windows: clean-windows windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
 	./script/build-windows
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe:
