@@ -41,6 +41,7 @@ clean-windows:
 	rm -f dist/windows/Nanobox*.exe
 
 certs:
+	mkdir -p certs
 	aws s3 sync \
 		s3://private.nanobox.io/certs \
 		certs/ \
