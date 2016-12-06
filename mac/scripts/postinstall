@@ -1,3 +1,0 @@
-#!/bin/bash
-
-osascript -e 'tell application "Terminal" to do script "echo Updating nanobox;/usr/local/bin/nanobox-update;exit"'

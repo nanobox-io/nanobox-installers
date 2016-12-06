@@ -4,7 +4,7 @@ VIRTUALBOX_REVISION := 112026
 
 .PHONY: mac windows clean clean-mac clean-windows publish publish-beta certs windows-env mac-env
 
-default: mac windows publish
+default: mac windows
 	@true
 
 clean: clean-mac clean-windows
@@ -20,16 +20,12 @@ windows-env:
 		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
 	fi
 
-mac: clean-mac mac-env mac/mpkg/nanobox.pkg/Scripts virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
+mac: clean-mac mac-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
 	./script/build-mac
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg"
-
-
-mac/mpkg/nanobox.pkg/Scripts:
-	cd mac; echo "scripts/postinstall" | cpio -o --format odc | gzip -c > mpkg/nanobox.pkg/Scripts
 
 windows: clean-windows windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
 	./script/build-windows
@@ -40,7 +36,6 @@ virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe:
 
 clean-mac:
 	rm -f dist/mac/Nanobox*.pkg
-	rm -f mac/mpkg/nanobox.pkg/Scripts
 
 clean-windows:
 	rm -f dist/windows/Nanobox*.exe
