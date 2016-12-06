@@ -3,15 +3,19 @@ FROM nanobox/mac-env
 ENV VBOX_VERSION 5.1.10
 ENV VBOX_REV 112026
 
-RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
-	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
+# RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
+#	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
+
+
+COPY /virtualbox/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg /vbox.dmg
 
 # Download the Nanobox pieces
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
 
 # fetch nanobox
-RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
+# RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
+RUN touch nanobox
 RUN chmod +x /nanobox
 
 # fetch nanobox-update

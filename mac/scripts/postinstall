@@ -1,2 +1,3 @@
 #!/bin/bash
-/usr/local/bin/nanobox-update
+
+osascript -e 'tell application "Terminal" to do script "echo Updating nanobox;/usr/local/bin/nanobox-update;exit"'

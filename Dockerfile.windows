@@ -11,7 +11,8 @@ RUN mkdir /bundle
 WORKDIR /bundle
 
 # fetch nanobox
-RUN curl -fsSL -o nanobox.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/windows/amd64/nanobox.exe"
+# RUN curl -fsSL -o nanobox.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/windows/amd64/nanobox.exe"
+RUN touch nanobox.exe
 
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update.exe "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/windows/amd64/nanobox-update.exe"
@@ -23,7 +24,8 @@ RUN unzip ansi166.zip
 RUN cp x64/* /bundle
 
 # fetch virtualbox
-RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"
+#RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"
+COPY /virtualbox/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe /bundle/virtualbox.exe
 RUN wine virtualbox.exe -extract -silent -path . && \
 	  rm virtualbox.exe && \
 	  rm *x86.msi && \
@@ -33,8 +35,8 @@ RUN wine virtualbox.exe -extract -silent -path . && \
 COPY windows /installer
 COPY certs/win /certs
 
-RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox.exe -out /bundle/nanobox-signed.exe && \
-    cp /bundle/nanobox-signed.exe /bundle/nanobox.exe
+#RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox.exe -out /bundle/nanobox-signed.exe && \
+#    cp /bundle/nanobox-signed.exe /bundle/nanobox.exe
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox Updater" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox-update.exe -out /bundle/nanobox-update-signed.exe && \
     cp /bundle/nanobox-update-signed.exe /bundle/nanobox-update.exe

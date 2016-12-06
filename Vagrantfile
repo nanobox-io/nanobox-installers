@@ -56,4 +56,15 @@ Vagrant.configure(2) do |config|
     docker pull debian:jessie
   SCRIPT
 
+  config.vm.provision "shell", inline: <<-SCRIPT
+    mkdir -p /root/.aws
+    cat > /root/.aws/config <<-END
+[default]
+region = us-west-2
+aws_secret_access_key = #{ENV["AWS_SECRET_ACCESS_KEY"]}
+aws_access_key_id = #{ENV["AWS_ACCESS_KEY_ID"]}
+END
+    chmod 600 /root/.aws/config
+  SCRIPT
+
 end

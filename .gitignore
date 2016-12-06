@@ -26,4 +26,6 @@ certs
 # vagrant
 .vagrant
 
+virtualbox
+
 mac/mpkg/nanobox.pkg/Scripts
