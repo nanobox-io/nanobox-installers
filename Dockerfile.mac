@@ -1,14 +1,5 @@
 FROM nanobox/mac-env
 
-ENV VBOX_VERSION 5.1.10
-ENV VBOX_REV 112026
-
-# RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
-#	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
-
-
-COPY /virtualbox/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg /vbox.dmg
-
 # Download the Nanobox pieces
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
@@ -21,25 +12,6 @@ RUN chmod +x /nanobox
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
 RUN chmod +x /nanobox-update
-
-#  Extract the VirtualBox .pkg
-RUN mkdir -p /mpkg/vbox && \
-	cd /mpkg/vbox && \
-	7z x /vbox.dmg -ir'!*.hfs' && \
-	7z x `find . -name '*.hfs'` -ir'!*.pkg' && \
-	mv VirtualBox/VirtualBox.pkg . && \
-	rm -rf vbox.dmg && \
-	rm -rf `find . -name '*.hfs'`
-
-# Extract the .pkg files
-RUN cd /mpkg/vbox && \
-	mv VirtualBox.pkg /tmp && \
-	xar -xf /tmp/VirtualBox.pkg && \
-	rm -rf /tmp/VirtualBox.pkg
-
-RUN cd /mpkg/vbox && \
-	mv *.pkg .. && \
-	rm -rf vbox
 
 # Add components
 COPY mac/mpkg/Distribution /mpkg/Distribution
@@ -68,13 +40,6 @@ COPY mac/mpkg/Resources /mpkg/Resources
 RUN sed -i \
 		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
 		mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf
-RUN sed -i \
-			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
-			/mpkg/Distribution && \
-		sed -i \
-			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
-			-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
-			mpkg/Resources/en.lproj/Localizable.strings
 
 # Repackage back. Yes, --compression=none is mandatory.
 # or this won't install in OSX.

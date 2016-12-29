@@ -3,6 +3,8 @@ FROM nanobox/windows-env
 # installer components
 ENV INSTALLER_VERSION 1
 ENV NANOBOX_VERSION 1
+ENV VIRTUALBOX_VERSION 5.1.12
+ENV VIRTUALBOX_REVISION 112440
 
 RUN mkdir /bundle
 
@@ -21,8 +23,16 @@ RUN unzip ansi166.zip
 
 RUN cp x64/* /bundle
 
+# fetch virtualbox
+#RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"
+COPY /virtualbox/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe /bundle/virtualbox.exe
+RUN wine virtualbox.exe -extract -silent -path . && \
+	  rm virtualbox.exe && \
+	  rm *x86.msi && \
+	  mv *_amd64.msi VirtualBox_amd64.msi
+
 # Add installer resources
-COPY windows /installer
+COPY windows-bundle /installer
 COPY certs/win /certs
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox.exe -out /bundle/nanobox-signed.exe && \
@@ -39,4 +49,4 @@ RUN rm -rf /tmp/.wine-0/
 RUN wine ../innosetup/ISCC.exe nanobox.iss /DMyAppVersion=$INSTALLER_VERSION
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox installer" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /installer/Output/NanoboxSetup.exe -out /installer/Output/NanoboxSetup-signed.exe && \
-    cp /installer/Output/NanoboxSetup-signed.exe /installer/Output/NanoboxSetup.exe
+    cp /installer/Output/NanoboxSetup-signed.exe /installer/Output/NanoboxBundleSetup.exe

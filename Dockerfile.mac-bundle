@@ -1,0 +1,93 @@
+FROM nanobox/mac-env
+
+ENV VBOX_VERSION 5.1.12
+ENV VBOX_REV 112440
+
+# RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
+#	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
+
+
+COPY /virtualbox/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg /vbox.dmg
+
+# Download the Nanobox pieces
+ENV INSTALLER_VERSION 1
+ENV NANOBOX_VERSION 1
+
+# fetch nanobox
+RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
+# RUN touch nanobox
+RUN chmod +x /nanobox
+
+# fetch nanobox-update
+RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
+RUN chmod +x /nanobox-update
+
+#  Extract the VirtualBox .pkg
+RUN mkdir -p /mpkg/vbox && \
+	cd /mpkg/vbox && \
+	7z x /vbox.dmg -ir'!*.hfs' && \
+	7z x `find . -name '*.hfs'` -ir'!*.pkg' && \
+	mv VirtualBox/VirtualBox.pkg . && \
+	rm -rf vbox.dmg && \
+	rm -rf `find . -name '*.hfs'`
+
+# Extract the .pkg files
+RUN cd /mpkg/vbox && \
+	mv VirtualBox.pkg /tmp && \
+	xar -xf /tmp/VirtualBox.pkg && \
+	rm -rf /tmp/VirtualBox.pkg
+
+RUN cd /mpkg/vbox && \
+	mv *.pkg .. && \
+	rm -rf vbox
+
+# Add components
+COPY mac-bundle/mpkg/Distribution /mpkg/Distribution
+
+# nanoboxBundle.pkg
+COPY mac-bundle/mpkg/nanoboxBundle.pkg /mpkg/nanoboxBundle.pkg
+RUN cd /mpkg/nanoboxBundle.pkg && \
+	mkdir rootfs && \
+	cd rootfs && \
+    mkdir -p usr/local/bin && \
+	mv /nanobox usr/local/bin/ && \
+	mv /nanobox-update usr/local/bin/ && \
+    ls -al /usr/local/bin/ && \
+	find . | cpio -o --format odc | gzip -c > ../Payload && \
+	mkbom . ../Bom && \
+	sed -i \
+		-e "s/%NANOBOX_NUMBER_OF_FILES%/`find . | wc -l`/g" \
+		-e "s/%NANOBOX_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
+		-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
+		../PackageInfo /mpkg/Distribution && \
+	cd .. && \
+	rm -rf ./rootfs
+
+COPY mac-bundle/mpkg/Resources /mpkg/Resources
+
+RUN sed -i \
+		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
+		mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf
+RUN sed -i \
+			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			/mpkg/Distribution && \
+		sed -i \
+			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
+			mpkg/Resources/en.lproj/Localizable.strings
+
+# Repackage back. Yes, --compression=none is mandatory.
+# or this won't install in OSX.
+RUN cd /mpkg && \
+	xar -c --compression=none -f /NanoboxBundle.pkg .
+
+COPY certs/mac /certs
+RUN cd /mpkg && \
+	xar --sign -f /NanoboxBundle.pkg --digestinfo-to-sign digestinfo.dat \
+	--sig-size 256 \
+	--cert-loc /certs/cert00 \
+	--cert-loc /certs/cert01 \
+	--cert-loc /certs/cert02 && \
+	openssl rsautl -sign -inkey /certs/key.pem -in digestinfo.dat \
+	-out signature.dat && \
+	xar --inject-sig signature.dat -f /NanoboxBundle.pkg

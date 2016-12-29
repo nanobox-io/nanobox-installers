@@ -1,13 +1,13 @@
 SHELL := /bin/bash
-VIRTUALBOX_VERSION := 5.1.10
-VIRTUALBOX_REVISION := 112026
+VIRTUALBOX_VERSION := 5.1.12
+VIRTUALBOX_REVISION := 112440
 
-.PHONY: mac windows clean clean-mac clean-windows publish publish-beta certs windows-env mac-env
+.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env
 
-default: mac windows
+default: mac windows mac-bundle windows-bundle
 	@true
 
-clean: clean-mac clean-windows
+clean: clean-mac clean-mac-bundle clean-windows-bundle clean-windows
 	@true
 
 mac-env:
@@ -20,25 +20,37 @@ windows-env:
 		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
 	fi
 
-mac: clean-mac mac-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
+mac: clean-mac mac-env certs
 	./script/build-mac
+
+mac-bundle: clean-mac-bundle mac-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
+	./script/build-mac-bundle
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg"
 
-windows: clean-windows windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
+windows: clean-windows windows-env certs
 	./script/build-windows
+
+windows-bundle: clean-windows-bundle windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
+	./script/build-windows-bundle
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe"
 
 clean-mac:
-	rm -f dist/mac/Nanobox*.pkg
+	if [[ -f dist/mac/Nanobox.pkg ]]; then rm -f dist/mac/Nanobox.pkg; fi
+
+clean-mac-bundle:
+	if [[ -f dist/mac/NanoboxBundle.pkg ]]; then rm -f dist/mac/NanoboxBundle.pkg; fi
 
 clean-windows:
-	rm -f dist/windows/Nanobox*.exe
+	if [[ -f dist/windows/NanoboxSetup.exe ]]; then rm -f dist/windows/NanoboxSetup.exe; fi
+
+clean-windows-bundle:
+	if [[ -f dist/windows/NanoboxBundleSetup.exe ]]; then rm -f dist/windows/NanoboxBundleSetup.exe; fi
 
 certs:
 	mkdir -p certs
