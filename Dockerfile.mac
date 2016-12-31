@@ -1,8 +1,10 @@
 FROM nanobox/mac-env
 
-# Download the Nanobox pieces
-ENV INSTALLER_VERSION 1
-ENV NANOBOX_VERSION 1
+ARG INSTALLER_VERSION
+ARG NANOBOX_VERSION
+ARG VIRTUALBOX_VERSION
+ARG VIRTUALBOX_REVISION
+ARG DOCKER_MACHINE_VERSION
 
 # fetch nanobox
 RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
@@ -12,6 +14,14 @@ RUN chmod +x /nanobox
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
 RUN chmod +x /nanobox-update
+
+# fetch openvpn
+RUN curl -fsSL -o nanobox-vpn "https://s3.amazonaws.com/tools.nanobox.io/openvpn/darwin/openvpn"
+RUN chmod +x /nanobox-vpn
+
+# fetch docker-machine
+RUN curl -fsSL -o nanobox-machine "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Darwin-x86_64"
+RUN chmod +x /nanobox-machine
 
 # Add components
 COPY mac/mpkg/Distribution /mpkg/Distribution
@@ -24,6 +34,8 @@ RUN cd /mpkg/nanobox.pkg && \
     mkdir -p usr/local/bin && \
 	mv /nanobox usr/local/bin/ && \
 	mv /nanobox-update usr/local/bin/ && \
+	mv /nanobox-vpn usr/local/bin/ && \
+	mv /nanobox-machine usr/local/bin/ && \
     ls -al /usr/local/bin/ && \
 	find . | cpio -o --format odc | gzip -c > ../Payload && \
 	mkbom . ../Bom && \

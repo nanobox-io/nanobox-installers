@@ -1,6 +1,9 @@
 SHELL := /bin/bash
+INSTALLER_VERSION := 2
+NANOBOX_VERSION := 2
 VIRTUALBOX_VERSION := 5.1.12
 VIRTUALBOX_REVISION := 112440
+DOCKER_MACHINE_VERSION := 0.8.2
 
 .PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env
 
@@ -21,20 +24,20 @@ windows-env:
 	fi
 
 mac: clean-mac mac-env certs
-	./script/build-mac
+	./script/build-mac ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 mac-bundle: clean-mac-bundle mac-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
-	./script/build-mac-bundle
+	./script/build-mac-bundle ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg"
 
 windows: clean-windows windows-env certs
-	./script/build-windows
+	./script/build-windows ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 windows-bundle: clean-windows-bundle windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
-	./script/build-windows-bundle
+	./script/build-windows-bundle ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe:
 	mkdir -p virtualbox
@@ -62,9 +65,12 @@ certs:
 publish:
 	aws s3 sync \
 		dist/ \
-		s3://tools.nanobox.io/installers/v1 \
+		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION} \
 		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
+	aws cloudfront create-invalidation \
+		--distribution-id E1O0D0A2DTYRY8 \
+		--paths /installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg /installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg /installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe /installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe 
 
 publish-beta:
 	aws s3 sync \

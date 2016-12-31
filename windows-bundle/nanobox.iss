@@ -6,11 +6,16 @@
 
 #define nanobox "..\bundle\nanobox.exe"
 #define nanoboxUpdater "..\bundle\nanobox-update.exe"
+#define nanoboxVpn "..\bundle\nanobox-vpn.exe"
+#define nanoboxMachine "..\bundle\nanobox-machine.exe"
 #define virtualBoxCommon "..\bundle\common.cab"
 #define virtualBoxMsi "..\bundle\VirtualBox_amd64.msi"
 #define ansiconexe "..\bundle\ansicon.exe"
 #define ansicon32 "..\bundle\ANSI32.dll"
 #define ansicon64 "..\bundle\ANSI64.dll"
+#define loggerdll "..\bundle\logger.dll"
+#define srvstartdll "..\bundle\srvstart.dll"
+#define srvstartexe "..\bundle\srvstart.exe"
 
 [Setup]
 AppCopyright={#MyAppPublisher}
@@ -59,11 +64,16 @@ Name: "VirtualBox"; Description: "VirtualBox"; Types: full custom; Flags: disabl
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
+Source: "{#nanoboxVpn}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
+Source: "{#nanoboxMachine}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#virtualBoxCommon}"; DestDir: "{app}\installers\virtualbox"; Components: "VirtualBox"
 Source: "{#virtualBoxMsi}"; DestDir: "{app}\installers\virtualbox"; DestName: "virtualbox.msi"; AfterInstall: RunInstallVirtualBox(); Components: "VirtualBox"
 Source: "{#ansiconexe}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#ansicon32}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#ansicon64}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#loggerdll}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#srvstartdll}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#srvstartexe}"; DestDir: "{app}"; Components: "Nanobox"
 
 [UninstallRun]
 Filename: "{app}\nanobox.exe"; Parameters: "implode"

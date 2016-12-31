@@ -6,9 +6,14 @@
 
 #define nanobox "..\bundle\nanobox.exe"
 #define nanoboxUpdater "..\bundle\nanobox-update.exe"
+#define nanoboxVpn "..\bundle\nanobox-vpn.exe"
+#define nanoboxMachine "..\bundle\nanobox-machine.exe"
 #define ansiconexe "..\bundle\ansicon.exe"
 #define ansicon32 "..\bundle\ANSI32.dll"
 #define ansicon64 "..\bundle\ANSI64.dll"
+#define loggerdll "..\bundle\logger.dll"
+#define srvstartdll "..\bundle\srvstart.dll"
+#define srvstartexe "..\bundle\srvstart.exe"
 
 [Setup]
 AppCopyright={#MyAppPublisher}
@@ -54,9 +59,14 @@ Name: "Nanobox"; Description: "Nanobox for Windows" ; Types: full custom; Flags:
 [Files]
 Source: "{#nanobox}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#nanoboxUpdater}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
+Source: "{#nanoboxVpn}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
+Source: "{#nanoboxMachine}"; DestDir: "{app}"; Flags: ignoreversion; Components: "Nanobox"
 Source: "{#ansiconexe}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#ansicon32}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#ansicon64}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#loggerdll}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#srvstartdll}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#srvstartexe}"; DestDir: "{app}"; Components: "Nanobox"
 
 [UninstallRun]
 Filename: "{app}\nanobox.exe"; Parameters: "implode"

@@ -1,9 +1,21 @@
 #!/bin/sh
 
+INSTALLER_VERSION=$1
+NANOBOX_VERSION=$2
+VIRTUALBOX_VERSION=$3
+VIRTUALBOX_REVISION=$4
+DOCKER_MACHINE_VERSION=$5
+
 set -e
 
-docker build --no-cache -t windows-installer -f Dockerfile.windows-bundle .
-CONTAINER="$(docker run -d windows-installer)"
+docker build --no-cache -t windows-bundle-installer \
+  --build-arg INSTALLER_VERSION=$INSTALLER_VERSION \
+  --build-arg NANOBOX_VERSION=$NANOBOX_VERSION \
+  --build-arg VIRTUALBOX_VERSION=$VIRTUALBOX_VERSION \
+  --build-arg VIRTUALBOX_REVISION=$VIRTUALBOX_REVISION \
+  --build-arg DOCKER_MACHINE_VERSION=$DOCKER_MACHINE_VERSION \
+  -f Dockerfile.windows-bundle .
+CONTAINER="$(docker run -d windows-bundle-installer)"
 mkdir -p dist/windows
 docker cp "${CONTAINER}":/installer/Output/NanoboxBundleSetup.exe dist/windows/
 # docker cp "${CONTAINER}":/installer/Output/NanoboxSetup-signed.exe dist/

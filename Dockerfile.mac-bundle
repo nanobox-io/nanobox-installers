@@ -1,17 +1,18 @@
 FROM nanobox/mac-env
 
-ENV VBOX_VERSION 5.1.12
-ENV VBOX_REV 112440
+ARG INSTALLER_VERSION
+ARG NANOBOX_VERSION
+ARG VIRTUALBOX_VERSION
+ARG VIRTUALBOX_REVISION
+ARG DOCKER_MACHINE_VERSION
 
-# RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg \
-#	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
+# RUN curl -fsSL -o /vbox.dmg http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-OSX.dmg \
+#	&& echo "$(curl -fsSL 'http://download.virtualbox.org/virtualbox/'"$VIRTUALBOX_VERSION"'/SHA256SUMS' | awk '$2 ~ /-OSX.dmg$/ { print $1 }') */vbox.dmg" | sha256sum -c -
 
 
-COPY /virtualbox/VirtualBox-$VBOX_VERSION-$VBOX_REV-OSX.dmg /vbox.dmg
+COPY /virtualbox/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-OSX.dmg /vbox.dmg
 
 # Download the Nanobox pieces
-ENV INSTALLER_VERSION 1
-ENV NANOBOX_VERSION 1
 
 # fetch nanobox
 RUN curl -fsSL -o nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox"
@@ -21,6 +22,14 @@ RUN chmod +x /nanobox
 # fetch nanobox-update
 RUN curl -fsSL -o nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/darwin/amd64/nanobox-update"
 RUN chmod +x /nanobox-update
+
+# fetch openvpn
+RUN curl -fsSL -o nanobox-vpn "https://s3.amazonaws.com/tools.nanobox.io/openvpn/darwin/openvpn"
+RUN chmod +x /nanobox-vpn
+
+# fetch docker-machine
+RUN curl -fsSL -o nanobox-machine "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Darwin-x86_64"
+RUN chmod +x /nanobox-machine
 
 #  Extract the VirtualBox .pkg
 RUN mkdir -p /mpkg/vbox && \
@@ -52,6 +61,8 @@ RUN cd /mpkg/nanoboxBundle.pkg && \
     mkdir -p usr/local/bin && \
 	mv /nanobox usr/local/bin/ && \
 	mv /nanobox-update usr/local/bin/ && \
+	mv /nanobox-vpn usr/local/bin/ && \
+	mv /nanobox-machine usr/local/bin/ && \
     ls -al /usr/local/bin/ && \
 	find . | cpio -o --format odc | gzip -c > ../Payload && \
 	mkbom . ../Bom && \
@@ -69,10 +80,10 @@ RUN sed -i \
 		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
 		mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf
 RUN sed -i \
-			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			-e "s/%VIRTUALBOX_VERSION%/$VIRTUALBOX_VERSION/g" \
 			/mpkg/Distribution && \
 		sed -i \
-			-e "s/%VBOX_VERSION%/$VBOX_VERSION/g" \
+			-e "s/%VIRTUALBOX_VERSION%/$VIRTUALBOX_VERSION/g" \
 			-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
 			mpkg/Resources/en.lproj/Localizable.strings
 
