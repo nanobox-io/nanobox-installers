@@ -23,6 +23,23 @@ RUN chmod +x /nanobox-vpn
 RUN curl -fsSL -o nanobox-machine "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Darwin-x86_64"
 RUN chmod +x /nanobox-machine
 
+# fetch tuntap osx
+RUN curl -fsSL -o tuntap_20150118.tar.gz "http://downloads.sourceforge.net/project/tuntaposx/tuntap/20150118/tuntap_20150118.tar.gz?r=http%3A%2F%2Ftuntaposx.sourceforge.net%2Fdownload.xhtml&ts=1483460040&use_mirror=superb-dca2"
+RUN tar -xzf tuntap_20150118.tar.gz && \
+	mkdir -p /mpkg/tuntap && \
+	mv tuntap_20150118.pkg /mpkg/tuntap
+
+# Extract the .pkg files
+RUN cd /mpkg/tuntap && \
+	mv tuntap_20150118.pkg /tmp && \
+	xar -xf /tmp/tuntap_20150118.pkg && \
+	rm -rf /tmp/tuntap_20150118.pkg
+
+RUN cd /mpkg/tuntap && \
+	mv *.pkg .. && \
+	cd .. && \
+	rm -rf tuntap
+
 # Add components
 COPY mac/mpkg/Distribution /mpkg/Distribution
 
@@ -43,6 +60,7 @@ RUN cd /mpkg/nanobox.pkg && \
 		-e "s/%NANOBOX_NUMBER_OF_FILES%/`find . | wc -l`/g" \
 		-e "s/%NANOBOX_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
 		-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
+		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
 		../PackageInfo /mpkg/Distribution && \
 	cd .. && \
 	rm -rf ./rootfs

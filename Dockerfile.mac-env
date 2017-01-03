@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y install \
 		hfsplus hfsutils hfsprogs cpio || \
 	apt-get update && apt-get -y install \
 		autoconf build-essential curl \
-		libxml2-dev libssl-dev \
+		libxml2-dev libssl-dev libbz2-dev \
 		p7zip-full \
 		hfsplus hfsutils hfsprogs cpio
 
