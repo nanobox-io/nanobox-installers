@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN dpkg --add-architecture i386
 RUN sed -i "s/main/main contrib non-free/" etc/apt/sources.list
-RUN apt-get update && apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev
+RUN apt-get update && apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev p7zip-full || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev p7zip-full || apt-get install -yq wine curl unrar unzip libcurl4-openssl-dev autoconf gcc make libssl-dev p7zip-full
 
 # innosetup
 RUN mkdir innosetup && \

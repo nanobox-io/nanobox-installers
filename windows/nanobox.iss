@@ -14,6 +14,10 @@
 #define loggerdll "..\bundle\logger.dll"
 #define srvstartdll "..\bundle\srvstart.dll"
 #define srvstartexe "..\bundle\srvstart.exe"
+#define oemvistainf "..\bundle\OemVista.inf"
+#define tap0901cat "..\bundle\tap0901.cat"
+#define tap0901sys "..\bundle\tap0901.sys"
+#define tapinstallexe "..\bundle\tapinstall.exe"
 
 [Setup]
 AppCopyright={#MyAppPublisher}
@@ -67,6 +71,10 @@ Source: "{#ansicon64}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#loggerdll}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#srvstartdll}"; DestDir: "{app}"; Components: "Nanobox"
 Source: "{#srvstartexe}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#oemvistainf}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#tap0901cat}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#tap0901sys}"; DestDir: "{app}"; Components: "Nanobox"
+Source: "{#tapinstallexe}"; DestDir: "{app}"; Components: "Nanobox"
 
 [UninstallRun]
 Filename: "{app}\nanobox.exe"; Parameters: "implode"
@@ -148,6 +156,25 @@ begin
     MsgBox('ansicon install failure', mbInformation, MB_OK);
 end;
 
+procedure RunInstallTapWindows();
+var
+  ExecStdout: AnsiString;
+  ResultCode: Integer;
+begin
+  WizardForm.FilenameLabel.Caption := 'installing Tap Windows Driver'
+  if Exec(ExpandConstant('{cmd}'), '/C "' + ExpandConstant('"{app}\tapinstall.exe"') + ' find tap0901 > ' + ExpandConstant('"{tmp}\taplist.txt"') + '"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    if LoadStringFromFile(ExpandConstant('{tmp}\taplist.txt'), ExecStdout) then
+    begin
+      if Pos('No matching devices found', String(ExecStdout)) > 0 then
+      begin
+        if not Exec(ExpandConstant('{app}\tapinstall.exe'), ExpandConstant('install "{app}/OemVista.inf" tap0901'), '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+          MsgBox('Tap install failure', mbInformation, MB_OK);
+      end;
+    end;
+  end;
+end;
+
 #include "modpath.iss"
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -157,6 +184,7 @@ begin
   Success := True;
   if CurStep = ssPostInstall then
   begin
+    RunInstallTapWindows();
     if isTaskSelected('ansicon') then
       RunInstallAnsicon();
     if IsTaskSelected(ModPathName) then

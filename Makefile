@@ -11,7 +11,7 @@ default: mac windows mac-bundle windows-bundle
 	@true
 
 clean: clean-mac clean-mac-bundle clean-windows-bundle clean-windows
-	@true
+	for i in $$(docker images -f "dangling=true" --format {{.ID}}); do docker rmi $$i; done
 
 mac-env:
 	if [[ ! $$(docker images nanobox/mac-env) =~ "nanobox/mac-env" ]]; then \

@@ -27,16 +27,26 @@ RUN curl -fsSL -o srvstart_run.v110.zip "http://www.zen18887.zen.co.uk/nick/bina
 RUN curl -fsSL -o nanobox-machine.exe "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Windows-x86_64.exe"
 
 # fetch ansicon
-RUN curl -fsSL -o ansi166.zip https://github.com/adoxa/ansicon/releases/download/v1.66/ansi166.zip
+RUN curl -fsSL -o ansi166.zip "https://github.com/adoxa/ansicon/releases/download/v1.66/ansi166.zip"
+
+# fetch tap-windows
+RUN curl -fsSL -o tap-windows-9.21.2.exe "https://swupdate.openvpn.org/community/releases/tap-windows-9.21.2.exe"
 
 # unzip things
 RUN unzip srvstart_run.v110.zip
 
 RUN unzip ansi166.zip
 
+RUN 7z x tap-windows-9.21.2.exe -aou
+
 # copy things to the bundle
 
 RUN cp x64/* /bundle
+
+RUN cp bin/tapinstall.exe /bundle
+RUN cp driver/OemVista.inf /bundle
+RUN cp driver/tap0901.cat /bundle
+RUN cp driver/tap0901.sys /bundle
 
 # fetch virtualbox
 #RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"
@@ -46,8 +56,6 @@ RUN wine virtualbox.exe -extract -silent -path . && \
 	  rm *x86.msi && \
 	  mv *_amd64.msi VirtualBox_amd64.msi
 
-# Add installer resources
-COPY windows-bundle /installer
 COPY certs/win /certs
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox.exe -out /bundle/nanobox-signed.exe && \
@@ -64,6 +72,9 @@ RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt 
 
 WORKDIR /installer
 RUN rm -rf /tmp/.wine-0/
+
+# Add installer resources
+COPY windows-bundle /installer
 
 # Uncomment once we're ready to integrate with mixpanel
 # RUN wine ../innosetup/ISCC.exe NanoboxSetup.iss /DMyAppVersion=$INSTALLER_VERSION /DMixpanelToken=$MIXPANEL_TOKEN
