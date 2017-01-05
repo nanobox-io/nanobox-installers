@@ -1,0 +1,10 @@
+FROM base/archlinux:2015.06.01
+
+ENV PATH $PATH:/root/.gem/ruby/2.3.0/bin
+
+# Install dependencies
+RUN pacman -Sy --noconfirm archlinux-keyring
+RUN pacman -Sy --noconfirm ruby gcc make curl
+
+# Install fpm
+RUN gem install --no-ri --no-rdoc fpm

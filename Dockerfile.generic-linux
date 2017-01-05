@@ -1,0 +1,30 @@
+FROM nanobox/generic-linux-env
+
+ARG INSTALLER_VERSION
+ARG NANOBOX_VERSION
+ARG VIRTUALBOX_VERSION
+ARG VIRTUALBOX_REVISION
+ARG DOCKER_MACHINE_VERSION
+
+# Make directory for file to live in
+RUN mkdir -p /fakeroot/usr/local/bin
+
+# fetch nanobox
+RUN curl -fsSL -o /fakeroot/usr/local/bin/nanobox "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/linux/amd64/nanobox"
+# RUN touch nanobox
+RUN chmod +x /fakeroot/usr/local/bin/nanobox
+
+# fetch nanobox-update
+RUN curl -fsSL -o /fakeroot/usr/local/bin/nanobox-update "https://s3.amazonaws.com/tools.nanobox.io/nanobox/v$NANOBOX_VERSION/linux/amd64/nanobox-update"
+RUN chmod +x /fakeroot/usr/local/bin/nanobox-update
+
+# fetch openvpn
+RUN curl -fsSL -o /fakeroot/usr/local/bin/nanobox-vpn "https://s3.amazonaws.com/tools.nanobox.io/openvpn/linux/openvpn"
+RUN chmod +x /fakeroot/usr/local/bin/nanobox-vpn
+
+# fetch docker-machine
+RUN curl -fsSL -o /fakeroot/usr/local/bin/nanobox-machine "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Linux-x86_64"
+RUN chmod +x /fakeroot/usr/local/bin/nanobox-machine
+
+# Create Package
+RUN tar -czf /nanobox-$INSTALLER_VERSION.tar.gz -C /fakeroot usr

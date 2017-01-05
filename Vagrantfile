@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
   config.vm.box     = "ubuntu/trusty64"
 
   config.vm.provider "virtualbox" do |v|
-    v.customize ["modifyvm", :id, "--memory", "2048", "--ioapic", "on"]
+    v.customize ["modifyvm", :id, "--memory", "4096", "--ioapic", "on", "--cpus", "4"]
   end
 
   config.vm.synced_folder ".", "/vagrant"

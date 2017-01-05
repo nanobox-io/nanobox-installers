@@ -1,0 +1,21 @@
+#!/bin/bash
+
+INSTALLER_VERSION=$1
+NANOBOX_VERSION=$2
+VIRTUALBOX_VERSION=$3
+VIRTUALBOX_REVISION=$4
+DOCKER_MACHINE_VERSION=$5
+
+set -e
+
+docker build --no-cache -t generic-linux-installer \
+  --build-arg INSTALLER_VERSION=$INSTALLER_VERSION \
+  --build-arg NANOBOX_VERSION=$NANOBOX_VERSION \
+  --build-arg VIRTUALBOX_VERSION=$VIRTUALBOX_VERSION \
+  --build-arg VIRTUALBOX_REVISION=$VIRTUALBOX_REVISION \
+  --build-arg DOCKER_MACHINE_VERSION=$DOCKER_MACHINE_VERSION \
+  -f Dockerfile.generic-linux .
+CONTAINER="$(docker run -d generic-linux-installer)"
+mkdir -p dist/linux
+docker cp "${CONTAINER}":/nanobox-${INSTALLER_VERSION}.tar.gz dist/linux/
+docker rm "${CONTAINER}" 2>/dev/null || true

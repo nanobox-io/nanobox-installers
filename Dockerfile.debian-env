@@ -1,0 +1,9 @@
+FROM debian:jessie
+
+# Install dependencies
+RUN apt-get -y update
+RUN apt-get -y upgrade
+RUN apt-get -y install ruby ruby-dev rubygems gcc make curl
+
+# Install fpm
+RUN gem install --no-ri --no-rdoc fpm
