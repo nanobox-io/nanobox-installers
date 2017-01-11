@@ -27,7 +27,7 @@ RUN curl -fsSL -o srvstart_run.v110.zip "http://www.zen18887.zen.co.uk/nick/bina
 RUN curl -fsSL -o nanobox-machine.exe "https://github.com/docker/machine/releases/download/v$DOCKER_MACHINE_VERSION/docker-machine-Windows-x86_64.exe"
 
 # fetch ansicon
-RUN curl -fsSL -o ansi166.zip https://github.com/adoxa/ansicon/releases/download/v1.66/ansi166.zip
+RUN curl -fsSL -o ansi166.zip "https://github.com/adoxa/ansicon/releases/download/v1.66/ansi166.zip"
 
 # fetch tap-windows
 RUN curl -fsSL -o tap-windows-9.21.2.exe "https://swupdate.openvpn.org/community/releases/tap-windows-9.21.2.exe"
@@ -48,6 +48,14 @@ RUN cp driver/OemVista.inf /bundle
 RUN cp driver/tap0901.cat /bundle
 RUN cp driver/tap0901.sys /bundle
 
+# fetch virtualbox
+#RUN curl -fsSL -o virtualbox.exe "http://download.virtualbox.org/virtualbox/$VIRTUALBOX_VERSION/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe"
+COPY /virtualbox/VirtualBox-$VIRTUALBOX_VERSION-$VIRTUALBOX_REVISION-Win.exe /bundle/virtualbox.exe
+RUN wine virtualbox.exe -extract -silent -path . && \
+	  rm virtualbox.exe && \
+	  rm *x86.msi && \
+	  mv *_amd64.msi VirtualBox_amd64.msi
+
 COPY certs/win /certs
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /bundle/nanobox.exe -out /bundle/nanobox-signed.exe && \
@@ -66,11 +74,11 @@ WORKDIR /installer
 RUN rm -rf /tmp/.wine-0/
 
 # Add installer resources
-COPY windows /installer
+COPY windows-bundle /installer
 
 # Uncomment once we're ready to integrate with mixpanel
 # RUN wine ../innosetup/ISCC.exe NanoboxSetup.iss /DMyAppVersion=$INSTALLER_VERSION /DMixpanelToken=$MIXPANEL_TOKEN
 RUN wine ../innosetup/ISCC.exe nanobox.iss /DMyAppVersion=$INSTALLER_VERSION
 
 RUN /osslsigncode/osslsigncode-1.7.1/osslsigncode sign -certs /certs/bundle.crt -key /certs/codesign.key -h sha256 -n "Nanobox installer" -i "http://nanobox.io" -t "http://timestamp.verisign.com/scripts/timstamp.dll" -in /installer/Output/NanoboxSetup.exe -out /installer/Output/NanoboxSetup-signed.exe && \
-    cp /installer/Output/NanoboxSetup-signed.exe /installer/Output/NanoboxSetup.exe
+    cp /installer/Output/NanoboxSetup-signed.exe /installer/Output/NanoboxBundleSetup.exe

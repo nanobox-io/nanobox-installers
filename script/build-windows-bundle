@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 INSTALLER_VERSION=$1
 NANOBOX_VERSION=$2
@@ -8,14 +8,15 @@ DOCKER_MACHINE_VERSION=$5
 
 set -e
 
-docker build --no-cache -t mac-installer \
+docker build --no-cache -t windows-bundle-installer \
   --build-arg INSTALLER_VERSION=$INSTALLER_VERSION \
   --build-arg NANOBOX_VERSION=$NANOBOX_VERSION \
   --build-arg VIRTUALBOX_VERSION=$VIRTUALBOX_VERSION \
   --build-arg VIRTUALBOX_REVISION=$VIRTUALBOX_REVISION \
   --build-arg DOCKER_MACHINE_VERSION=$DOCKER_MACHINE_VERSION \
-  -f Dockerfile.mac .
-CONTAINER="$(docker run -d mac-installer)"
-mkdir -p dist/mac
-docker cp "${CONTAINER}":/Nanobox.pkg dist/mac/
+  -f Dockerfile.windows-bundle .
+CONTAINER="$(docker run -d windows-bundle-installer)"
+mkdir -p dist/windows
+docker cp "${CONTAINER}":/installer/Output/NanoboxBundleSetup.exe dist/windows/
+# docker cp "${CONTAINER}":/installer/Output/NanoboxSetup-signed.exe dist/
 docker rm "${CONTAINER}" 2>/dev/null || true
