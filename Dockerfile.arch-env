@@ -1,10 +1,16 @@
 FROM base/archlinux:2015.06.01
 
-ENV PATH $PATH:/root/.gem/ruby/2.3.0/bin
+ENV PATH $PATH:/opt/ruby2.3/bin
 
 # Install dependencies
 RUN pacman -Sy --noconfirm archlinux-keyring
-RUN pacman -Sy --noconfirm ruby gcc make curl
+RUN pacman -Syu --noconfirm git gcc make curl base-devel gdbm openssl libffi doxygen graphviz libyaml ttf-dejavu tk gdbm openssl libffi libyaml gmp zlib readline
+
+RUN git clone https://aur.archlinux.org/ruby2.3.git
+RUN chown -R git /ruby2.3
+RUN cd ruby2.3 && su git -c "makepkg"
+
+RUN pacman -U --noconfirm /ruby2.3/ruby2.3-2.3.3-1-x86_64.pkg.tar.xz
 
 # Install fpm
 RUN gem install --no-ri --no-rdoc fpm
