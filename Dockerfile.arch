@@ -27,4 +27,4 @@ RUN curl -fsSL -o /fakeroot/usr/local/bin/nanobox-machine "https://github.com/do
 RUN chmod +x /fakeroot/usr/local/bin/nanobox-machine
 
 # Create Package
-RUN fpm -t pacman -n nanobox -v $INSTALLER_VERSION -s dir /fakeroot/usr/local/bin/=/usr/local/bin/
+RUN fpm -t pacman -n nanobox -v $INSTALLER_VERSION -s dir /fakeroot/usr/local/bin/=/usr/bin/
