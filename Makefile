@@ -5,7 +5,7 @@ VIRTUALBOX_VERSION := 5.1.12
 VIRTUALBOX_REVISION := 112440
 DOCKER_MACHINE_VERSION := 0.8.2
 
-.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env
+.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env urls
 
 default: mac windows mac-bundle windows-bundle arch centos debian generic-linux
 	@true
@@ -117,9 +117,13 @@ publish:
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION} \
 		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
+	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
 		--distribution-id E1O0D0A2DTYRY8 \
-		--paths /installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg /installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg /installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe /installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe 
+		--paths /installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg /installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg \
+		/installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe /installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe \
+		/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm /installers/v${INSTALLER_VERSION}/linux/nanobox_${INSTALLER_VERSION}_amd64.deb \
+		/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz /installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}.tar.gz \
 
 publish-beta:
 	aws s3 sync \
@@ -127,3 +131,23 @@ publish-beta:
 		s3://tools.nanobox.io/installers/beta \
 		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
+
+urls:
+	@echo S3:
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox_${INSTALLER_VERSION}_amd64.deb
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz
+	@echo https://s3.amazonaws.com/tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}.tar.gz
+	@echo CloudFront:
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/linux/nanobox_${INSTALLER_VERSION}_amd64.deb
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz
+	@echo https://d1ormdui8qdvue.cloudfront.net/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}.tar.gz
