@@ -6,35 +6,24 @@
     <welcome file="welcome.rtfd" mime-type="text/rtfd"/>
     <choices-outline>
         <line choice="choiceNanobox"/>
-        <line choice="choiceVBoxKEXTs"/>
-        <line choice="choiceVBox"/>
-        <line choice="choiceVBoxCLI"/>
-        <line choice="tap"/>
-        <line choice="tun"/>
+        <line choice="choiceVbox">
+        <line choice="choiceTap"/>
     </choices-outline>
     <choice id="choiceNanobox" title="choiceNanobox_title" description="choiceNanobox_msg" start_enabled="false" start_selected="true" start_visible="true">
         <pkg-ref id="io.nanobox.pkg.nanobox"/>
     </choice>
-    <choice id="choiceVBoxKEXTs" title="choiceVBoxKEXTs_title" description="choiceVBoxKEXTs_msg" start_selected="true" start_enabled="false" start_visible="true">
+    <choice id="choiceVBox" title="choiceVBox_title" description="choiceVBox_msg" start_selected="vboxNeedsUpgrade()" start_enabled="vboxNeedsUpgrade()" start_visible="vboxNeedsUpgrade()">
         <pkg-ref id="org.virtualbox.pkg.vboxkexts"/>
-    </choice>
-    <choice id="choiceVBox" title="choiceVBox_title" description="choiceVBox_msg" start_selected="true" start_enabled="false" start_visible="true">
         <pkg-ref id="org.virtualbox.pkg.virtualbox"/>
-    </choice>
-    <choice id="choiceVBoxCLI" title="choiceVBoxCLI_title" description="choiceVBoxCLI_msg" start_selected="true" start_enabled="true" start_visible="true">
         <pkg-ref id="org.virtualbox.pkg.virtualboxcli"/>
     </choice>
-    <choice id="tap" title="Ethertap kernel extension" description="The ethertap kernel extensions allows applications to connect simulated ethernet segments to the kernel via virtual ethernet interfaces.">
+    <choice id="choiceTap" title="Ethertap kernel extension" description="The ethertap kernel extensions allows applications to connect simulated ethernet segments to the kernel via virtual ethernet interfaces." start_enabled="tapNeedsUpgrade()" start_selected="tapNeedsUpgrade()" start_visible="tapNeedsUpgrade()">
         <pkg-ref id="tap"/>
-    </choice>
-    <choice id="tun" title="IP Tunnel kernel extension" description="Provides virtual network interfaces allowing applications to exchange IP packets with the kernel.">
-        <pkg-ref id="tun"/>
     </choice>
     <pkg-ref id="org.virtualbox.pkg.vboxkexts" auth="Root" version="5.1.12" installKBytes="544">#VBoxKEXTs.pkg</pkg-ref>
     <pkg-ref id="org.virtualbox.pkg.virtualbox" auth="Root" version="5.1.12" installKBytes="172714">#VirtualBox.pkg</pkg-ref>
     <pkg-ref id="org.virtualbox.pkg.virtualboxcli" auth="Root" version="5.1.12" installKBytes="5">#VirtualBoxCLI.pkg</pkg-ref>
     <pkg-ref id="tap" auth="root" packageIdentifier="net.sf.tuntaposx.tap" version="20150118.0.0" installKBytes="57">#tap.pkg</pkg-ref>
-    <pkg-ref id="tun" auth="root" packageIdentifier="net.sf.tuntaposx.tun" version="20150118.0.0" installKBytes="57">#tun.pkg</pkg-ref>
     <pkg-ref id="io.nanobox.pkg.nanobox" auth="Root" version="%NANOBOX_VERSION%" installKBytes="%NANOBOX_INSTALL_KBYTES%">#nanoboxBundle.pkg</pkg-ref>
     <pkg-ref id="io.nanobox.pkg.nanobox">
         <bundle-version/>
@@ -58,11 +47,6 @@
     <pkg-ref id="tap">
         <bundle-version>
             <bundle CFBundleShortVersionString="20150118" CFBundleVersion="1.0" id="net.sf.tuntaposx.tap" path="Library/Extensions/tap.kext"/>
-        </bundle-version>
-    </pkg-ref>
-    <pkg-ref id="tun">
-        <bundle-version>
-            <bundle CFBundleShortVersionString="20150118" CFBundleVersion="1.0" id="net.sf.tuntaposx.tun" path="Library/Extensions/tun.kext"/>
         </bundle-version>
     </pkg-ref>
 
@@ -138,6 +122,29 @@
              }
 
              return false;
+         } catch (e){ system.log(e); return false; }
+     }
+
+     function tapNeedsUpgrade ()
+     {
+         try {
+            rcScript = system.run('/bin/sh', '-c', '/usr/sbin/kextstat | /usr/bin/grep "\.tap"')
+            if (rcScript == 0) {
+               rcScript2 = system.run('/bin/sh', '-c', '/usr/sbin/kextstat | /usr/bin/grep "23FDB715-3D0D-3A26-ACBA-E3794C231CB7"')
+               if (rcScript2 == 0) {
+                  return false;
+               } else {
+                  rcScript3 = system.run('/bin/sh', '-c', 'kextstat | grep -E "net.sf.tuntaposx.tap|foo.tap"')
+                  if (rcScript2 == 0) {
+                     return true;
+                  } else {
+                     system.log("tap driver might not work");
+                     return false;
+                  }
+               }
+            } else {
+               return true;
+            }
          } catch (e){ system.log(e); return false; }
      }
      /* js:pkmk:end */

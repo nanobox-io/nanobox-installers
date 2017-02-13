@@ -36,7 +36,7 @@ RUN cd /mpkg/tuntap && \
 	rm -rf /tmp/tuntap_20150118.pkg
 
 RUN cd /mpkg/tuntap && \
-	mv *.pkg .. && \
+	mv tap.pkg .. && \
 	cd .. && \
 	rm -rf tuntap
 
