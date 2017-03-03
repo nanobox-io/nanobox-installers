@@ -15,7 +15,7 @@ before_install:
   - sudo chmod 600 /root/.aws/config
 
 script:
-  - sudo make
+  - sudo make -j 8
 
 after_success:
   - if [ "$BRANCH" == "master" ]; then
