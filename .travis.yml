@@ -19,7 +19,7 @@ script:
 
 after_success:
   - if [ "$BRANCH" == "master" ]; then
-      sudo make publish
+      sudo make publish;
     else
-      sudo make publish-beta
+      sudo make publish-beta;
     fi
