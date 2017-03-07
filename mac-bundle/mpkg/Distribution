@@ -6,7 +6,7 @@
     <welcome file="welcome.rtfd" mime-type="text/rtfd"/>
     <choices-outline>
         <line choice="choiceNanobox"/>
-        <line choice="choiceVbox">
+        <line choice="choiceVbox"/>
         <line choice="choiceTap"/>
     </choices-outline>
     <choice id="choiceNanobox" title="choiceNanobox_title" description="choiceNanobox_msg" start_enabled="false" start_selected="true" start_visible="true">
@@ -20,9 +20,9 @@
     <choice id="choiceTap" title="Ethertap kernel extension" description="The ethertap kernel extensions allows applications to connect simulated ethernet segments to the kernel via virtual ethernet interfaces." start_enabled="tapNeedsUpgrade()" start_selected="tapNeedsUpgrade()" start_visible="tapNeedsUpgrade()">
         <pkg-ref id="tap"/>
     </choice>
-    <pkg-ref id="org.virtualbox.pkg.vboxkexts" auth="Root" version="5.1.12" installKBytes="544">#VBoxKEXTs.pkg</pkg-ref>
-    <pkg-ref id="org.virtualbox.pkg.virtualbox" auth="Root" version="5.1.12" installKBytes="172714">#VirtualBox.pkg</pkg-ref>
-    <pkg-ref id="org.virtualbox.pkg.virtualboxcli" auth="Root" version="5.1.12" installKBytes="5">#VirtualBoxCLI.pkg</pkg-ref>
+    <pkg-ref id="org.virtualbox.pkg.vboxkexts" auth="Root" version="%VIRTUALBOX_VERSION%" installKBytes="544">#VBoxKEXTs.pkg</pkg-ref>
+    <pkg-ref id="org.virtualbox.pkg.virtualbox" auth="Root" version="%VIRTUALBOX_VERSION%" installKBytes="172742">#VirtualBox.pkg</pkg-ref>
+    <pkg-ref id="org.virtualbox.pkg.virtualboxcli" auth="Root" version="%VIRTUALBOX_VERSION%" installKBytes="5">#VirtualBoxCLI.pkg</pkg-ref>
     <pkg-ref id="tap" auth="root" packageIdentifier="net.sf.tuntaposx.tap" version="20150118.0.0" installKBytes="57">#tap.pkg</pkg-ref>
     <pkg-ref id="io.nanobox.pkg.nanobox" auth="Root" version="%NANOBOX_VERSION%" installKBytes="%NANOBOX_INSTALL_KBYTES%">#nanoboxBundle.pkg</pkg-ref>
     <pkg-ref id="io.nanobox.pkg.nanobox">
