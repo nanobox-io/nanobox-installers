@@ -40,6 +40,14 @@ RUN cd /mpkg/tuntap && \
 	cd .. && \
 	rm -rf tuntap
 
+RUN mkdir /tmp/tap.pkg && \
+    cd /tmp/tap.pkg && \
+    cat /mpkg/tap.pkg/Payload | gunzip - | cpio -idv && \
+    sed -i'' 's/net.sf.tuntaposx.tun/net.sf.tuntaposx.tap/g;s/tun.kext/tap.kext/g' Library/LaunchDaemons/net.sf.tuntaposx.tap.plist && \
+    find . | cpio -o --format odc | gzip -c > /mpkg/tap.pkg/Payload && \
+    cd /tmp && \ 
+    rm -rf /tmp/tap.pkg
+
 # Add components
 COPY mac/mpkg/Distribution /mpkg/Distribution
 
