@@ -6,7 +6,7 @@ before_install:
   - sudo apt-get -y purge docker-engine
   - bash <(curl -fsSL https://get.docker.com/)
   - docker pull debian:jessie
-  - sudo apt-get install awscli
+  - sudo -H pip install awscli
   - sudo mkdir -p /root/.aws/
   - sudo bash -c "echo \"[default]\" > /root/.aws/config"
   - sudo bash -c "echo \"region = us-west-2\" > /root/.aws/config"
