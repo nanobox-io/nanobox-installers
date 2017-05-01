@@ -165,7 +165,7 @@ publish-arch:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -176,7 +176,7 @@ publish-centos:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -187,7 +187,7 @@ publish-debian:
 	aws s3 cp \
 		dist/linux/nanobox_${INSTALLER_VERSION}_amd64.deb \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox_${INSTALLER_VERSION}_amd64.deb \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -198,7 +198,7 @@ publish-generic-linux:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}.tar.gz \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/linux/nanobox-${INSTALLER_VERSION}.tar.gz \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -209,7 +209,7 @@ publish-mac:
 	aws s3 cp \
 		dist/mac/Nanobox.pkg \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/mac/Nanobox.pkg \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -220,7 +220,7 @@ publish-mac-bundle:
 	aws s3 cp \
 		dist/mac/NanoboxBundle.pkg \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/mac/NanoboxBundle.pkg \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -231,7 +231,7 @@ publish-windows:
 	aws s3 cp \
 		dist/windows/NanoboxSetup.exe \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/windows/NanoboxSetup.exe \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -242,7 +242,7 @@ publish-windows-bundle:
 	aws s3 cp \
 		dist/windows/NanoboxBundleSetup.exe \
 		s3://tools.nanobox.io/installers/v${INSTALLER_VERSION}/windows/NanoboxBundleSetup.exe \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 	aws configure set preview.cloudfront true
 	aws cloudfront create-invalidation \
@@ -267,56 +267,56 @@ publish-beta-arch:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz \
 		s3://tools.nanobox.io/installers/beta/linux/nanobox-${INSTALLER_VERSION}-1-x86_64.pkg.tar.xz \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-centos:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm \
 		s3://tools.nanobox.io/installers/beta/linux/nanobox-${INSTALLER_VERSION}-1.x86_64.rpm \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-debian:
 	aws s3 cp \
 		dist/linux/nanobox_${INSTALLER_VERSION}_amd64.deb \
 		s3://tools.nanobox.io/installers/beta/linux/nanobox_${INSTALLER_VERSION}_amd64.deb \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-generic-linux:
 	aws s3 cp \
 		dist/linux/nanobox-${INSTALLER_VERSION}.tar.gz \
 		s3://tools.nanobox.io/installers/beta/linux/nanobox-${INSTALLER_VERSION}.tar.gz \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-mac:
 	aws s3 cp \
 		dist/mac/Nanobox.pkg \
 		s3://tools.nanobox.io/installers/beta/mac/Nanobox.pkg \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-mac-bundle:
 	aws s3 cp \
 		dist/mac/NanoboxBundle.pkg \
 		s3://tools.nanobox.io/installers/beta/mac/NanoboxBundle.pkg \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-windows:
 	aws s3 cp \
 		dist/windows/NanoboxSetup.exe \
 		s3://tools.nanobox.io/installers/beta/windows/NanoboxSetup.exe \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 publish-beta-windows-bundle:
 	aws s3 cp \
 		dist/windows/NanoboxBundleSetup.exe \
 		s3://tools.nanobox.io/installers/beta/windows/NanoboxBundleSetup.exe \
-		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+		--grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers \
 		--region us-east-1
 
 
