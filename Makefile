@@ -3,7 +3,7 @@ INSTALLER_VERSION := 2
 NANOBOX_VERSION := 2
 VIRTUALBOX_VERSION := 5.1.14
 VIRTUALBOX_REVISION := 112924
-DOCKER_MACHINE_VERSION := 0.8.2
+DOCKER_MACHINE_VERSION := 0.11.0
 
 .PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env urls
 
