@@ -1,26 +1,28 @@
 sudo: required
 
-dist: trusty
+services:
+  - docker
+
+env:
+  - MAKE_TARGET=mac
+  - MAKE_TARGET=windows
+  - MAKE_TARGET=mac-bundle
+  - MAKE_TARGET=windows-bundle
+  - MAKE_TARGET=arch
+  - MAKE_TARGET=centos
+  - MAKE_TARGET=debian
+  - MAKE_TARGET=generic-linux
 
 before_install:
-  - sudo apt-get -y purge docker-engine
-  - bash <(curl -fsSL https://get.docker.com/)
-  - docker pull debian:jessie
   - sudo -H pip install awscli
-  - sudo mkdir -p /root/.aws/
-  - sudo bash -c "echo \"[default]\" > /root/.aws/config"
-  - sudo bash -c "echo \"region = us-west-2\" > /root/.aws/config"
-  - sudo bash -c "echo \"aws_secret_access_key = $AWS_SECRET_ACCESS_KEY\" > /root/.aws/config"
-  - sudo bash -c "echo \"aws_access_key_id = $AWS_ACCESS_KEY_ID\" > /root/.aws/config"
-  - sudo chmod 600 /root/.aws/config
 
 script:
-  - sudo make
+  - sudo make $MAKE_TARGET
 
 after_success:
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
   - if [ "$BRANCH" == "master" ]; then
-      sudo make publish;
+      sudo make publish-${MAKE_TARGET};
     else
-      sudo make publish-beta;
+      sudo make publish-beta-${MAKE_TARGET};
     fi
