@@ -8,7 +8,7 @@ DOCKER_MACHINE_VERSION=$5
 
 set -e
 
-docker build -t mac-bundle-installer \
+docker build --no-cache -t mac-bundle-installer \
   --build-arg INSTALLER_VERSION=$INSTALLER_VERSION \
   --build-arg NANOBOX_VERSION=$NANOBOX_VERSION \
   --build-arg VIRTUALBOX_VERSION=$VIRTUALBOX_VERSION \

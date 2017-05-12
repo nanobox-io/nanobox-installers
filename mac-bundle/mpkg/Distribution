@@ -53,7 +53,7 @@
     <product id="io.nanobox.mpkg.nanobox" version="%INSTALLER_VERSION%"/>
 
     <!-- Manually imported VBox Stuff -->
-    <!-- <installation-check script="checkPrerequisite()"/> -->
+    <installation-check script="checkPrerequisite()"/>
     <script>
     <![CDATA[
     /* js:pkmk:start */
