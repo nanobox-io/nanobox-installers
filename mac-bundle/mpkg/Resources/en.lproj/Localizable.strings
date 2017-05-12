@@ -3,17 +3,17 @@
 'choiceNanobox_title' = 'Nanobox v%NANOBOX_VERSION%';
 'choiceNanobox_msg' = 'Installs Nanobox for Mac OS X into /usr/local/bin/';
 
-'choiceDockerMachineCLI_title' = 'Docker Machine %DOCKERMACHINE_VERSION%';
-'choiceDockerMachineCLI_msg' = 'Installs the Docker Machine binaries into /usr/local/bin/';
+'choiceTap_title' = 'Ethertap kernel extension';
+'choiceTap_msg' = 'The ethertap kernel extensions allows applications to connect simulated ethernet segments to the kernel via virtual ethernet interfaces.';
 
-'choiceVBox_title' = 'Oracle VM VirtualBox %VBOX_VERSION%';
-'choiceVBox_msg' = 'Installs or Upgrades the Oracle VM VirtualBox application into /Applications if it is not already installed.';
+'choiceVBox_title' = 'Oracle VM VirtualBox';
+'choiceVBox_msg' = 'Installs the Oracle VM VirtualBox application into /Applications.';
 
-'RUNNING_VMS_TLE' = "Please Quit VirtualBox!";
-'RUNNING_VMS_MSG' = "The installer has detected that VirtualBox is out of date, and is still running. Please shut down all VMs, quit VirtualBox, and then restart the Docker Toolbox installation.";
+'RUNNING_VMS_TLE' = "Running VirtualBox virtual machines detected!";
+'RUNNING_VMS_MSG' = "The installer has detected running virtual machines. Please shut down all running VirtualBox machines and then restart the installation.";
 
 'UNSUPPORTED_HW_MACHINE_TLE' = "Unsupported hardware architecture detected!";
-'UNSUPPORTED_HW_MACHINE_MSG' = "The installer has detected an unsupported architecture. VirtualBox only runs on the x86 and amd64 architectures.";
+'UNSUPPORTED_HW_MACHINE_MSG' = "The installer has detected an unsupported architecture. VirtualBox only runs on the amd64 architecture.";
 
 'UNSUPPORTED_OS_TLE' = "Unsupported OS version detected!";
-'UNSUPPORTED_OS_MSG' = "The installer has detected an unsupported operation system. Please upgrade to Mac OS X 10.8 or later.";
+'UNSUPPORTED_OS_MSG' = "The installer has detected an unsupported operation system. VirtualBox requires Mac OS X 10.9 or later.";

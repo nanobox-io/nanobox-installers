@@ -79,6 +79,8 @@ RUN cd /mpkg/vbox && \
 # Add components
 COPY mac-bundle/mpkg/Distribution /mpkg/Distribution
 
+COPY mac-bundle/mpkg/Resources /mpkg/Resources
+
 # nanoboxBundle.pkg
 COPY mac-bundle/mpkg/nanoboxBundle.pkg /mpkg/nanoboxBundle.pkg
 RUN cd /mpkg/nanoboxBundle.pkg && \
@@ -96,23 +98,10 @@ RUN cd /mpkg/nanoboxBundle.pkg && \
 		-e "s/%NANOBOX_INSTALL_KBYTES%/`du -sk | cut -f1`/g" \
 		-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
 		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
-		../PackageInfo /mpkg/Distribution && \
+		-e "s/%VIRTUALBOX_VERSION%/$VIRTUALBOX_VERSION/g" \
+		../PackageInfo /mpkg/Distribution /mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf /mpkg/Resources/en.lproj/Localizable.strings && \
 	cd .. && \
 	rm -rf ./rootfs
-
-COPY mac-bundle/mpkg/Resources /mpkg/Resources
-
-RUN sed -i \
-		-e "s/%INSTALLER_VERSION%/$INSTALLER_VERSION/g" \
-		mpkg/Resources/en.lproj/welcome.rtfd/TXT.rtf
-
-RUN sed -i \
-			-e "s/%VIRTUALBOX_VERSION%/$VIRTUALBOX_VERSION/g" \
-			/mpkg/Distribution && \
-	sed -i \
-		-e "s/%VIRTUALBOX_VERSION%/$VIRTUALBOX_VERSION/g" \
-		-e "s/%NANOBOX_VERSION%/$NANOBOX_VERSION/g" \
-		mpkg/Resources/en.lproj/Localizable.strings
 
 # Repackage back. Yes, --compression=none is mandatory.
 # or this won't install in OSX.
