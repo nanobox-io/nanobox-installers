@@ -2,7 +2,7 @@ SHELL := /bin/bash
 INSTALLER_VERSION := 2
 NANOBOX_VERSION := 2
 VIRTUALBOX_VERSION := 5.1.24
-VIRTUALBOX_REVISION := 115126
+VIRTUALBOX_REVISION := 117012
 DOCKER_MACHINE_VERSION := 0.8.2
 
 .PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env urls
