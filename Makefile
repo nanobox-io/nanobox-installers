@@ -5,7 +5,7 @@ VIRTUALBOX_VERSION := 5.1.26
 VIRTUALBOX_REVISION := 117224
 DOCKER_MACHINE_VERSION := 0.8.2
 
-.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env urls envs push-envs
+.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs urls
 
 default: mac windows mac-bundle windows-bundle arch centos debian generic-linux
 	@true
@@ -17,46 +17,6 @@ clean: clean-mac clean-mac-bundle clean-windows-bundle clean-windows clean-arch 
 
 clean-all: clean
 	for i in $$(docker images --format {{.ID}}); do docker rmi $$i; done
-
-envs: mac-env windows-env centos-env debian-env arch-env generic-linux-env
-
-push-envs:
-	docker push nanobox/generic-linux-env
-	docker push nanobox/arch-env
-	docker push nanobox/debian-env
-	docker push nanobox/centos-env
-	docker push nanobox/windows-env
-	docker push nanobox/mac-env
-
-mac-env:
-	if [[ ! $$(docker images nanobox/mac-env) =~ "nanobox/mac-env" ]]; then \
-		docker build --no-cache -t nanobox/mac-env -f Dockerfile.mac-env .;\
-	fi
-
-windows-env:
-	if [[ ! $$(docker images nanobox/windows-env) =~ "nanobox/windows-env" ]]; then \
-		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
-	fi
-
-centos-env:
-	if [[ ! $$(docker images nanobox/centos-env) =~ "nanobox/centos-env" ]]; then \
-		docker build --no-cache -t nanobox/centos-env -f Dockerfile.centos-env .; \
-	fi
-
-debian-env:
-	if [[ ! $$(docker images nanobox/debian-env) =~ "nanobox/debian-env" ]]; then \
-		docker build --no-cache -t nanobox/debian-env -f Dockerfile.debian-env .; \
-	fi
-
-arch-env:
-	if [[ ! $$(docker images nanobox/arch-env) =~ "nanobox/arch-env" ]]; then \
-		docker build --no-cache -t nanobox/arch-env -f Dockerfile.arch-env .; \
-	fi
-
-generic-linux-env:
-	if [[ ! $$(docker images nanobox/generic-linux-env) =~ "nanobox/generic-linux-env" ]]; then \
-		docker build --no-cache -t nanobox/generic-linux-env -f Dockerfile.generic-linux-env .; \
-	fi
 
 mac: clean-mac certs
 	./script/build-mac ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
