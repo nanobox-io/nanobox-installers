@@ -2,10 +2,10 @@ sudo: required
 
 dist: trusty
 
+services:
+  - docker
+
 before_install:
-  - sudo apt-get -y purge docker-engine
-  - bash <(curl -fsSL https://get.docker.com/)
-  - docker pull debian:jessie
   - sudo -H pip install awscli
   - sudo mkdir -p /root/.aws/
   - sudo bash -c "echo \"[default]\" > /root/.aws/config"
