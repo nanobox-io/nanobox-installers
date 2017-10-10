@@ -5,7 +5,7 @@ VIRTUALBOX_VERSION := 5.1.28
 VIRTUALBOX_REVISION := 117968
 DOCKER_MACHINE_VERSION := 0.8.2
 
-.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs windows-env mac-env urls
+.PHONY: mac windows mac-bundle windows-bundle clean clean-mac clean-mac-bundle clean-windows clean-windows-bundle publish publish-beta certs urls
 
 default: mac windows mac-bundle windows-bundle arch centos debian generic-linux
 	@true
@@ -18,66 +18,36 @@ clean: clean-mac clean-mac-bundle clean-windows-bundle clean-windows clean-arch 
 clean-all: clean
 	for i in $$(docker images --format {{.ID}}); do docker rmi $$i; done
 
-mac-env:
-	if [[ ! $$(docker images nanobox/mac-env) =~ "nanobox/mac-env" ]]; then \
-		docker build --no-cache -t nanobox/mac-env -f Dockerfile.mac-env .;\
-	fi
-
-windows-env:
-	if [[ ! $$(docker images nanobox/windows-env) =~ "nanobox/windows-env" ]]; then \
-		docker build --no-cache -t nanobox/windows-env -f Dockerfile.windows-env .; \
-	fi
-
-centos-env:
-	if [[ ! $$(docker images nanobox/centos-env) =~ "nanobox/centos-env" ]]; then \
-		docker build --no-cache -t nanobox/centos-env -f Dockerfile.centos-env .; \
-	fi
-
-debian-env:
-	if [[ ! $$(docker images nanobox/debian-env) =~ "nanobox/debian-env" ]]; then \
-		docker build --no-cache -t nanobox/debian-env -f Dockerfile.debian-env .; \
-	fi
-
-arch-env:
-	if [[ ! $$(docker images nanobox/arch-env) =~ "nanobox/arch-env" ]]; then \
-		docker build --no-cache -t nanobox/arch-env -f Dockerfile.arch-env .; \
-	fi
-
-generic-linux-env:
-	if [[ ! $$(docker images nanobox/generic-linux-env) =~ "nanobox/generic-linux-env" ]]; then \
-		docker build --no-cache -t nanobox/generic-linux-env -f Dockerfile.generic-linux-env .; \
-	fi
-
-mac: clean-mac mac-env certs
+mac: clean-mac certs
 	./script/build-mac ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
-mac-bundle: clean-mac-bundle mac-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
+mac-bundle: clean-mac-bundle virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg certs
 	./script/build-mac-bundle ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-OSX.dmg"
 
-windows: clean-windows windows-env certs
+windows: clean-windows certs
 	./script/build-windows ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
-windows-bundle: clean-windows-bundle windows-env virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
+windows-bundle: clean-windows-bundle virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe certs
 	./script/build-windows-bundle ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe:
 	mkdir -p virtualbox
 	curl -fsSL -o virtualbox/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe "http://download.virtualbox.org/virtualbox/${VIRTUALBOX_VERSION}/VirtualBox-${VIRTUALBOX_VERSION}-${VIRTUALBOX_REVISION}-Win.exe"
 
-centos: clean-centos centos-env
+centos: clean-centos
 	./script/build-centos ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
-debian: clean-debian debian-env
+debian: clean-debian
 	./script/build-debian ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
-arch: clean-arch arch-env
+arch: clean-arch
 	./script/build-arch ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
-generic-linux: clean-generic-linux generic-linux-env
+generic-linux: clean-generic-linux
 	./script/build-generic-linux ${INSTALLER_VERSION} ${NANOBOX_VERSION} ${VIRTUALBOX_VERSION} ${VIRTUALBOX_REVISION} ${DOCKER_MACHINE_VERSION}
 
 clean-mac:
