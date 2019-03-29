@@ -4,4 +4,4 @@ This repo contains the files necessary to create the [Nanobox](http://nanobox.io
 
 ## License
 
-Mozilla Public License, version 2.0
+MIT
